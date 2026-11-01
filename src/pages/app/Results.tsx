@@ -265,20 +265,6 @@ export default function Results() {
                   </div>
                 </div>
               )}
-              {selected.connections && selected.connections.length > 0 && (
-                <div>
-                  <div className="text-[13px] font-medium text-fog mb-1">Connections</div>
-                  <div className="space-y-2">
-                    {selected.connections.map((c, idx) => (
-                      <div key={idx} className="rounded-lg border border-white/[0.06] p-2">
-                        <div className="text-[13px] text-fog">{c.type}</div>
-                        <div className="text-[14px]">{c.value}</div>
-                        {c.source && <div className="text-[12px] text-fog-dim mt-0.5">From {c.source}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
               {selected.url && (
                 <a href={selected.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-[13px] hover:bg-white/15">
                   Open profile <ChevronRight className="size-3" />
