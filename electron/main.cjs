@@ -130,3 +130,14 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
   return results
 })
 
+
+app.whenReady().then(() => {
+  createWindow()
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit()
+})
