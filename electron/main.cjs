@@ -49,8 +49,18 @@ function runCmd(cmd, args, timeoutMs) {
 function extractAll(text) {
   const urls = text.match(/https?:\/\/[^\s\)\]\"]+/gi) || []
   const emails = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || []
-  const phones = text.match(/\+?\d[\d\s().-]{7,}\d/g) || []
-  return { urls, emails: Array.from(new Set(emails)), phones: Array.from(new Set(phones)) }
+  const phones = text.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g) || []
+  return { 
+    urls, 
+    emails: Array.from(new Set(emails)), 
+    phones: Array.from(new Set(phones)).filter(p => {
+      const digits = p.replace(/\D/g,'')
+      if(digits.length < 7 || digits.length > 15) return false
+      if(digits.length === 10 || digits.length === 11) return true
+      if(digits.length >= 12 && digits.length <= 15 && p.includes('+')) return true
+      return false
+    }) 
+  }
 }
 
 function categorizeSite(site) {
@@ -75,7 +85,7 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
       const nameMatches = out.match(/fullname:\s*(.+)/gi) || []
       for (const nm of nameMatches) {
         const v = nm.replace(/fullname:\s*/i,'').trim()
-        if (v && v.length > 2 && !v.includes('http')) connections.push({type: 'name', value: v, source: 'maigret'})
+        if (v && v.length > 2 && v.length < 60 && !/[0-9]/.test(v) && !v.includes('http') && !/avatar|image|count|id|uid/i.test(v)) connections.push({type: 'name', value: v, source: 'maigret'})
       }
       for (const url of extracted.urls) {
         try {
