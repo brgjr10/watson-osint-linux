@@ -103,7 +103,7 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
           const k = site.toLowerCase()
           if (site && !seen.has(k)) {
             seen.add(k)
-            const uniqConns = Array.from(new Map(connections.map(c=>[c.type+':'+c.value,c])).values()).slice(0, 20)
+            const uniqConns = Array.from(new Map(connections.map(c=>[c.type+':'+c.value+':'+site,c])).values()).slice(0, 30)
             results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'username match', match: 'exact', url, username: query, connections: uniqConns })
           }
         } catch {}
