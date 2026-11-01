@@ -80,6 +80,15 @@ export interface FoundProfile {
   hue: string
   detail: string
   match: 'exact' | 'likely'
+  url?: string
+  username?: string
+  links?: string[]
+  emails?: string[]
+  phones?: string[]
+  bio?: string
+  location?: string
+  name?: string
+  connections?: Array<{type: string, value: string, source?: string}>
 }
 
 export const foundProfiles: FoundProfile[] = [

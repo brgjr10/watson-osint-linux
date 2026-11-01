@@ -51,13 +51,23 @@ function runCmd(cmd, args, timeoutMs) {
   })
 }
 
+function extractAll(text) {
+  const urls = text.match(/https?:\/\/[^\s\)\]\"]+/gi) || []
+  const emails = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || []
+  const phones = text.match(/\+?\d[\d\s().-]{7,}\d/g) || []
+  return { urls, emails: Array.from(new Set(emails)), phones: Array.from(new Set(phones)) }
+}
+
 ipcMain.handle('lookup', async (_e, kind, query) => {
   const results = []
   const seen = new Set()
+  const connections = []
   try {
     if (kind === 'username') {
       const { out } = await runCmd('timeout', ['30', 'python3', '-m', 'maigret', query, '--top-sites', '50'], 90000)
-      const urls = out.match(/https?:\/\/[^\s\)\]\"]+/gi) || []
+      const { urls, emails, phones } = extractAll(out)
+      for (const e of emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
+      for (const p of phones) connections.push({type: 'phone', value: p, source: 'maigret'})
       for (const url of urls) {
         try {
           const u = new URL(url)
@@ -80,24 +90,40 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
           const k = site.toLowerCase()
           if (site && !seen.has(k)) {
             seen.add(k)
-            results.push({ site, group: 'Social', since: '', hue: '#58a6ff', detail: 'username match', match: 'exact' })
+            results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'username match', match: 'exact', url, username: query, connections: connections.slice(0, 10) })
           }
         } catch {}
       }
     } else if (kind === 'email') {
       const { out } = await runCmd('python3', ['-m', 'holehe', query], 60000)
+      const { urls, emails, phones } = extractAll(out)
+      for (const e of emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'holehe'})
+      for (const p of phones) connections.push({type: 'phone', value: p, source: 'holehe'})
       for (const line of out.split('\n')) {
         const m = line.match(/\[\+\]\s*(\S+)/)
         if (m) {
-          results.push({ site: m[1], group: 'Social', since: '', hue: '#58a6ff', detail: 'email registered', match: 'likely' })
+          const site = m[1]
+          if (!seen.has(site.toLowerCase())) {
+            seen.add(site.toLowerCase())
+            results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'email registered', match: 'likely', emails: [query], connections: connections.slice(0, 10) })
+          }
         }
       }
     }
   } catch (e) {
     // ignore
   }
-  try { fs.appendFileSync('/tmp/lookup.log', JSON.stringify(results.length) + ' ' + query + '\n'); } catch (e) {}
+  try { fs.appendFileSync('/tmp/lookup.log', JSON.stringify({count: results.length, query, kind}) + '\n'); } catch (e) {}
   return results
+}
+
+function categorizeSite(site) {
+  const s = site.toLowerCase()
+  if (/github|gitlab|stackoverflow|dev\.to|npm|docker/.test(s)) return 'Dev'
+  if (/reddit|4chan|habr|forum/.test(s)) return 'Forums'
+  if (/steam|twitch|xbox|psn|chess\.com/.test(s)) return 'Gaming'
+  if (/youtube|soundcloud|medium|pinterest|imgur/.test(s)) return 'Media'
+  return 'Social'
 })
 
 app.whenReady().then(() => {

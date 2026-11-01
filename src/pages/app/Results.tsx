@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { CaretRight as ChevronRight, DownloadSimple as Download, Sparkle as Sparkles } from '@phosphor-icons/react'
+import { CaretRight as ChevronRight, DownloadSimple as Download, Sparkle as Sparkles, X } from '@phosphor-icons/react'
 import { BrandIcon } from '../../components/BrandIcon'
 import { GlassLens } from '../../components/GlassLens'
 import { detectKind, searchProfiles, type FoundProfile, type PlatformGroup } from '../../data/mock'
@@ -20,6 +20,7 @@ export default function Results() {
 
   const [profiles, setProfiles] = useState<FoundProfile[]>([])
   const [loading, setLoading] = useState(true)
+  const [selected, setSelected] = useState<FoundProfile | null>(null)
 
   useEffect(() => {
     if (q) {
@@ -139,7 +140,7 @@ export default function Results() {
         <ul className="mt-4 overflow-hidden rounded-2xl border border-transparent bg-ink-850 ring-1 ring-white/[0.06]">
           {list.map((p, i) => (
             <li key={p.site} className={done ? undefined : 'animate-fade-up'}>
-              <button className="group flex w-full items-center gap-3.5 px-4 py-3 text-left transition-colors hover:bg-white/[0.04] focus-visible:-outline-offset-3">
+              <button onClick={() => setSelected(p)} className="group flex w-full items-center gap-3.5 px-4 py-3 text-left transition-colors hover:bg-white/[0.04] focus-visible:-outline-offset-3">
                 <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-white/[0.07] ring-1 ring-white/[0.06]">
                   <BrandIcon site={p.site} className="size-5 text-paper" />
                 </span>
@@ -158,6 +159,102 @@ export default function Results() {
             </li>
           ))}
         </ul>
+      )}
+
+      {selected && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setSelected(null)} />
+          <div className="relative w-full max-w-lg rounded-2xl border border-white/[0.08] bg-ink-900 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-[10px] bg-white/[0.07] ring-1 ring-white/[0.06]">
+                  <BrandIcon site={selected.site} className="size-5 text-paper" />
+                </span>
+                <div>
+                  <div className="text-[16px] font-medium">{selected.site}</div>
+                  <div className="text-[13px] text-fog">{selected.group} · {selected.match === 'exact' ? 'Same person' : 'Name match'}</div>
+                </div>
+              </div>
+              <button onClick={() => setSelected(null)} className="grid size-8 place-items-center rounded-lg hover:bg-white/[0.06]">
+                <X className="size-4" />
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-y-auto px-5 py-4 space-y-4">
+              <div>
+                <div className="text-[13px] font-medium text-fog mb-1">Details</div>
+                <div className="text-[14px]">{selected.detail}</div>
+                <div className="mt-1 text-[13px] text-fog">Since {selected.since}</div>
+              </div>
+              {selected.username && (
+                <div>
+                  <div className="text-[13px] font-medium text-fog mb-1">Username</div>
+                  <div className="text-[14px]">{selected.username}</div>
+                </div>
+              )}
+              {selected.name && (
+                <div>
+                  <div className="text-[13px] font-medium text-fog mb-1">Name</div>
+                  <div className="text-[14px]">{selected.name}</div>
+                </div>
+              )}
+              {selected.bio && (
+                <div>
+                  <div className="text-[13px] font-medium text-fog mb-1">Bio</div>
+                  <div className="text-[14px] whitespace-pre-wrap">{selected.bio}</div>
+                </div>
+              )}
+              {selected.location && (
+                <div>
+                  <div className="text-[13px] font-medium text-fog mb-1">Location</div>
+                  <div className="text-[14px]">{selected.location}</div>
+                </div>
+              )}
+              {selected.emails && selected.emails.length > 0 && (
+                <div>
+                  <div className="text-[13px] font-medium text-fog mb-1">Emails</div>
+                  <div className="space-y-1">
+                    {selected.emails.map((e) => (<div key={e} className="text-[14px]">{e}</div>))}
+                  </div>
+                </div>
+              )}
+              {selected.phones && selected.phones.length > 0 && (
+                <div>
+                  <div className="text-[13px] font-medium text-fog mb-1">Phones</div>
+                  <div className="space-y-1">
+                    {selected.phones.map((p) => (<div key={p} className="text-[14px]">{p}</div>))}
+                  </div>
+                </div>
+              )}
+              {selected.links && selected.links.length > 0 && (
+                <div>
+                  <div className="text-[13px] font-medium text-fog mb-1">Links</div>
+                  <div className="space-y-1">
+                    {selected.links.map((l) => (<a key={l} href={l} target="_blank" rel="noreferrer" className="block text-[14px] text-gas-400 hover:underline break-all">{l}</a>))}
+                  </div>
+                </div>
+              )}
+              {selected.connections && selected.connections.length > 0 && (
+                <div>
+                  <div className="text-[13px] font-medium text-fog mb-1">Connections</div>
+                  <div className="space-y-2">
+                    {selected.connections.map((c, idx) => (
+                      <div key={idx} className="rounded-lg border border-white/[0.06] p-2">
+                        <div className="text-[13px] text-fog">{c.type}</div>
+                        <div className="text-[14px]">{c.value}</div>
+                        {c.source && <div className="text-[12px] text-fog-dim mt-0.5">From {c.source}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {selected.url && (
+                <a href={selected.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-[13px] hover:bg-white/15">
+                  Open profile <ChevronRight className="size-3" />
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
