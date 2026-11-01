@@ -116,23 +116,23 @@ export async function searchProfiles(query: string): Promise<FoundProfile[]> {
   if (!q) return []
   const kind = detectKind(q)
   try {
-    const w = (globalThis as any).window
+    const w = typeof window !== 'undefined' ? (window as any) : (globalThis as any).window
     const api = w?.api || (globalThis as any).api
+    console.log('searchProfiles called', q, kind, !!api)
     if (api && typeof api.runLookup === 'function') {
       const lookupKind = kind === 'email' ? 'email' : 'username'
-      const res = await Promise.race([
+      const res: any = await Promise.race([
         api.runLookup(lookupKind, q),
-        new Promise((resolve) => setTimeout(() => resolve([]), 15000))
+        new Promise((resolve) => setTimeout(() => resolve([]), 30000))
       ])
+      console.log('searchProfiles result', res)
       if (Array.isArray(res) && res.length > 0) {
         return res
       }
     }
   } catch (e) {
-    // ignore
+    console.log('searchProfiles err', e)
   }
   // No fallback to mock data
   return []
-
-
 }
