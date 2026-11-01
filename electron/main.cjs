@@ -68,10 +68,16 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
   const connections = []
   try {
     if (kind === 'username') {
-      const { out } = await runCmd('timeout', ['30', 'python3', '-m', 'maigret', query, '--top-sites', '50'], 90000)
+      const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '50', '--print-errors'], 120000)
       const extracted = extractAll(out)
       for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
       for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'maigret'})
+      // extract names/fullnames
+      const nameMatches = out.match(/fullname:\s*(.+)/gi) || []
+      for (const nm of nameMatches) {
+        const v = nm.replace(/fullname:\s*/i,'').trim()
+        if (v && v.length > 2 && !v.includes('http')) connections.push({type: 'name', value: v, source: 'maigret'})
+      }
       for (const url of extracted.urls) {
         try {
           const u = new URL(url)
@@ -94,22 +100,22 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
           const k = site.toLowerCase()
           if (site && !seen.has(k)) {
             seen.add(k)
-            results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'username match', match: 'exact', url, username: query, connections: connections.slice(0, 10) })
+            results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'username match', match: 'exact', url, username: query, connections: Array.from(new Map(connections.map(c=>[c.type+':'+c.value,c])).values()).slice(0, 20) })
           }
         } catch {}
       }
     } else if (kind === 'email') {
-      const { out } = await runCmd('python3', ['-m', 'holehe', query], 60000)
+      const { out } = await runCmd('/home/brgjr10/.local/bin/holehe', [query], 90000)
       const extracted = extractAll(out)
       for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'holehe'})
       for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'holehe'})
       for (const line of out.split('\n')) {
-        const m = line.match(/\[\+\]\s*(\S+)/)
+        const m = line.match(/\[\+\]\s*(.+)/)
         if (m) {
-          const site = m[1]
-          if (!seen.has(site.toLowerCase())) {
+          const site = m[1].trim()
+          if (site && !seen.has(site.toLowerCase())) {
             seen.add(site.toLowerCase())
-            results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'email registered', match: 'likely', emails: [query], connections: connections.slice(0, 10) })
+            results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'email registered', match: 'likely', emails: [query], connections: Array.from(new Map(connections.map(c=>[c.type+':'+c.value,c])).values()).slice(0, 20) })
           }
         }
       }
