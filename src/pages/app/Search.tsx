@@ -12,6 +12,7 @@ import {
 } from '@phosphor-icons/react'
 import { GlassLens } from '../../components/GlassLens'
 import { detectKind, type SearchKind } from '../../data/mock'
+import { addHistory } from '../../lib/history'
 
 export const kindMeta: Record<SearchKind, { label: string; icon: typeof AtSign; hint: string }> = {
   username: { label: 'Nickname', icon: AtSign, hint: 'johndoe_92' },
@@ -36,7 +37,10 @@ export default function Search() {
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    if (q.trim()) navigate(`/app/results?q=${encodeURIComponent(q.trim())}`)
+    if (q.trim()) {
+      addHistory(q.trim())
+      navigate(`/app/results?q=${encodeURIComponent(q.trim())}`)
+    }
   }
 
   return (

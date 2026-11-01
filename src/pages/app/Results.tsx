@@ -3,8 +3,9 @@ import { useSearchParams } from 'react-router-dom'
 import { CaretRight as ChevronRight, DownloadSimple as Download, Sparkle as Sparkles } from '@phosphor-icons/react'
 import { BrandIcon } from '../../components/BrandIcon'
 import { GlassLens } from '../../components/GlassLens'
-import { detectKind, searchProfiles, type PlatformGroup } from '../../data/mock'
+import { detectKind, searchProfiles, type FoundProfile, type PlatformGroup } from '../../data/mock'
 import { kindMeta } from './Search'
+import { addHistory } from '../../lib/history'
 
 const stages = ['Checking social networks', 'Checking forums', 'Checking developer sites', 'Checking games and media', 'Putting it together']
 const groups: ('All' | PlatformGroup)[] = ['All', 'Social', 'Dev', 'Gaming', 'Forums', 'Media']
@@ -17,19 +18,42 @@ export default function Results() {
   const [progress, setProgress] = useState(0)
   const [filter, setFilter] = useState<(typeof groups)[number]>('All')
 
-  // Progress is timed locally; swap in the real job status when lookups are connected.
+  const [profiles, setProfiles] = useState<FoundProfile[]>([])
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    setProgress(0)
-    const t = setInterval(() => setProgress((p) => Math.min(100, p + 4)), 90)
+    if (q) {
+      try { addHistory(q) } catch {}
+    }
+    setProgress(10)
+    setLoading(true)
+    setProfiles([])
+    const t = setInterval(() => setProgress((p) => Math.min(99, p + 40)), 10)
+    searchProfiles(q).then((res) => {
+      setProfiles(Array.isArray(res) ? res : [])
+      setLoading(false)
+      setProgress(100)
+      clearInterval(t)
+    }).catch(() => {
+      setProfiles([])
+      setLoading(false)
+      setProgress(100)
+      clearInterval(t)
+    })
     return () => clearInterval(t)
   }, [q])
 
-  const done = progress >= 100
+  const done = !loading
   const stage = Math.min(stages.length - 1, Math.floor(progress / (100 / stages.length)))
-  const profiles = searchProfiles(q)
-  const visible = profiles.slice(0, Math.round((progress / 100) * profiles.length))
-  const list = visible.filter((p) => filter === 'All' || p.group === filter)
-  const same = profiles.filter((p) => p.match === 'exact').length
+  const visible = profiles
+  const list = visible.filter((p: FoundProfile) => filter === 'All' || p.group === filter)
+  const same = profiles.filter((p: FoundProfile) => p.match === 'exact').length
+
+  useEffect(() => {
+    if (done && progress < 100) {
+      setProgress(100)
+    }
+  }, [done, progress])
 
   return (
     <div className="mx-auto max-w-[760px] px-5 pb-16 pt-8">
@@ -54,13 +78,11 @@ export default function Results() {
       {!done ? (
         <div className="mt-8">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 text-[15px]">
-            <span>{stages[stage]}…</span>
-            <span className="tabular-nums text-fog">
-              {Math.round((progress / 100) * SITES).toLocaleString('en-US')} of {SITES.toLocaleString('en-US')} sites
-            </span>
+            <span>Searching…</span>
+            <span className="tabular-nums text-fog">{Math.round((progress / 100) * SITES).toLocaleString('en-US')} of {SITES.toLocaleString('en-US')} sites</span>
           </div>
           <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/[0.08]">
-            <div className="h-full rounded-full bg-gas-400 transition-[width] duration-200" style={{ width: `${progress}%` }} />
+            <div className="h-full rounded-full bg-gas-400 transition-[width] duration-50" style={{ width: `${progress}%` }} />
           </div>
         </div>
       ) : profiles.length === 0 ? (
@@ -93,7 +115,7 @@ export default function Results() {
         <div className="-mx-5 mt-8 overflow-x-auto px-5 py-1">
           <div className="inline-flex rounded-[10px] bg-white/[0.07] p-0.5" aria-label="Filter by type" role="group">
             {groups.map((g) => {
-              const n = g === 'All' ? visible.length : visible.filter((p) => p.group === g).length
+              const n = g === 'All' ? visible.length : visible.filter((p: FoundProfile) => p.group === g).length
               const on = g === filter
               return (
                 <button

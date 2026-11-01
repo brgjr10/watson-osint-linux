@@ -53,6 +53,13 @@
     },
     "portable": {
       "artifactName": "Watson-${version}-portable.exe"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "build/icon.png",
+      "category": "Utility"
     }
   }
 }

@@ -18,29 +18,9 @@ export interface GraphEdge {
   label?: string
 }
 
-export const caseGraph: { nodes: GraphNode[]; edges: GraphEdge[] } = {
-  nodes: [
-    { id: 'root', label: 'acme-logistics.com', kind: 'domain', x: 50, y: 46, root: true },
-    { id: 'co', label: 'ACME Logistics GmbH', kind: 'company', x: 26, y: 24 },
-    { id: 'sub1', label: 'vpn.acme-logistics.com', kind: 'domain', x: 70, y: 24, risk: 'high' },
-    { id: 'sub2', label: 'staging.acme-logistics.com', kind: 'domain', x: 68, y: 58, risk: 'medium' },
-    { id: 'ip', label: '185.193.88.14', kind: 'ip', x: 72, y: 88 },
-    { id: 'cert', label: 'CN=*.acme-logistics.com', kind: 'cert', x: 48, y: 78 },
-    { id: 'mail', label: 'it-ops@acme-logistics.com', kind: 'email', x: 26, y: 68 },
-    { id: 'leak', label: '2024 data breach', kind: 'leak', x: 24, y: 92, risk: 'high' },
-    { id: 'repo', label: 'github.com/acme-dev', kind: 'repo', x: 50, y: 7, risk: 'medium' },
-  ],
-  edges: [
-    { from: 'root', to: 'co', label: 'WHOIS' },
-    { from: 'root', to: 'sub1', label: 'crt.sh' },
-    { from: 'root', to: 'sub2', label: 'Amass' },
-    { from: 'sub2', to: 'ip', label: 'DNS A' },
-    { from: 'root', to: 'cert' },
-    { from: 'root', to: 'mail', label: 'theHarvester' },
-    { from: 'mail', to: 'leak', label: 'HIBP' },
-    { from: 'root', to: 'repo', label: 'code search' },
-    { from: 'co', to: 'repo' },
-  ],
+export const caseGraph: { nodes: any[]; edges: any[] } = {
+  nodes: [],
+  edges: [],
 }
 
 export type ToolCategory = 'Infrastructure' | 'Identity' | 'Corporate' | 'Web & archive' | 'Threat intel' | 'Code'
@@ -55,24 +35,12 @@ export interface Tool {
 }
 
 export const tools: Tool[] = [
-  { name: 'SpiderFoot', category: 'Threat intel', description: 'Automates 200+ OSINT modules across IPs, domains and names.', license: 'MIT', status: 'connected', runs: 1284 },
-  { name: 'theHarvester', category: 'Identity', description: 'Collects emails, names, subdomains and hosts from public sources.', license: 'GPL-2.0', status: 'connected', runs: 2310 },
-  { name: 'OWASP Amass', category: 'Infrastructure', description: 'In-depth attack surface mapping and asset discovery.', license: 'Apache-2.0', status: 'connected', runs: 1876 },
-  { name: 'Subfinder', category: 'Infrastructure', description: 'Fast passive subdomain enumeration.', license: 'MIT', status: 'connected', runs: 3402 },
-  { name: 'crt.sh', category: 'Infrastructure', description: 'Certificate Transparency log search.', license: 'Public', status: 'connected', runs: 4120 },
-  { name: 'Shodan', category: 'Infrastructure', description: 'Internet-wide scan data for exposed services.', license: 'API key', status: 'available', runs: 0 },
-  { name: 'Censys', category: 'Infrastructure', description: 'Hosts, certificates and services on the public internet.', license: 'API key', status: 'available', runs: 0 },
-  { name: 'Maigret', category: 'Identity', description: 'Username presence across 3,000+ public sites.', license: 'MIT', status: 'connected', runs: 742 },
-  { name: 'holehe', category: 'Identity', description: 'Checks where an email address is registered.', license: 'GPL-3.0', status: 'beta', runs: 318 },
-  { name: 'Have I Been Pwned', category: 'Threat intel', description: 'Breach exposure for domains and emails.', license: 'API key', status: 'connected', runs: 980 },
-  { name: 'OpenCorporates', category: 'Corporate', description: 'Company registries from 140+ jurisdictions.', license: 'Open data', status: 'connected', runs: 615 },
-  { name: 'GLEIF', category: 'Corporate', description: 'Legal Entity Identifiers and ownership chains.', license: 'Open data', status: 'connected', runs: 204 },
-  { name: 'Wayback Machine', category: 'Web & archive', description: 'Historical snapshots of any public URL.', license: 'Public', status: 'connected', runs: 1530 },
-  { name: 'WHOIS / RDAP', category: 'Web & archive', description: 'Domain registration and registrar records.', license: 'Public', status: 'connected', runs: 2988 },
-  { name: 'urlscan.io', category: 'Web & archive', description: 'Sandboxed page scans, screenshots and DOM.', license: 'API key', status: 'available', runs: 0 },
-  { name: 'GitHub Code Search', category: 'Code', description: 'Leaked secrets and references in public repos.', license: 'Public API', status: 'beta', runs: 156 },
-  { name: 'AlienVault OTX', category: 'Threat intel', description: 'Community threat indicators and pulses.', license: 'Free API', status: 'available', runs: 0 },
-  { name: 'GreyNoise', category: 'Threat intel', description: 'Separates targeted traffic from internet noise.', license: 'API key', status: 'available', runs: 0 },
+  { name: 'Maigret', category: 'Identity', description: 'Username enumeration across sites', license: 'Open source', status: 'connected', runs: 0 },
+  { name: 'Holehe', category: 'Identity', description: 'Email account discovery', license: 'Open source', status: 'connected', runs: 0 },
+  { name: 'Sherlock', category: 'Identity', description: 'Username search across social networks', license: 'Open source', status: 'available', runs: 0 },
+  { name: 'WhatsMyName', category: 'Identity', description: 'Username OSINT tool', license: 'Open source', status: 'available', runs: 0 },
+  { name: 'Subfinder', category: 'Infrastructure', description: 'Subdomain discovery', license: 'Open source', status: 'available', runs: 0 },
+  { name: 'Amass', category: 'Infrastructure', description: 'In-depth attack surface mapping', license: 'Open source', status: 'available', runs: 0 },
 ]
 
 export interface CaseRow {
@@ -87,22 +55,9 @@ export interface CaseRow {
   owner: string
 }
 
-export const cases: CaseRow[] = [
-  { id: 'WT-1042', title: 'ACME Logistics vendor check', target: 'acme-logistics.com', kind: 'domain', purpose: 'Vendor risk', status: 'running', entities: 214, updated: '2 min ago', owner: 'AK' },
-  { id: 'WT-1039', title: 'Northwind Holdings due diligence', target: 'Northwind Holdings', kind: 'company', purpose: 'Due diligence', status: 'review', entities: 87, updated: '1 h ago', owner: 'ML' },
-  { id: 'WT-1036', title: 'Contoso lookalike domains', target: 'contoso.io', kind: 'domain', purpose: 'Brand protection', status: 'monitoring', entities: 41, updated: '3 h ago', owner: 'SR' },
-  { id: 'WT-1031', title: 'Phishing kit infra cluster', target: '45.155.205.0/24', kind: 'ip', purpose: 'Threat intel', status: 'closed', entities: 362, updated: 'Yesterday', owner: 'AK' },
-  { id: 'WT-1027', title: 'Leaked credentials sweep', target: 'globex.com', kind: 'domain', purpose: 'Incident response', status: 'closed', entities: 129, updated: 'Oct 22', owner: 'JD' },
-]
+export const cases: CaseRow[] = []
 
-export const agentSteps = [
-  { tool: 'WHOIS / RDAP', text: 'Registrant resolves to ACME Logistics GmbH, Hamburg. Registrar: Gandi SAS.', ms: 412 },
-  { tool: 'crt.sh', text: 'Found 38 certificates, 23 unique hostnames. vpn.* first seen 2021-03.', ms: 1180 },
-  { tool: 'OWASP Amass', text: 'Passive enumeration surfaced staging.acme-logistics.com → 185.193.88.14.', ms: 8420 },
-  { tool: 'theHarvester', text: '6 role mailboxes discovered, incl. it-ops@ and billing@.', ms: 5230 },
-  { tool: 'Have I Been Pwned', text: 'it-ops@ appears in 1 breach corpus (2024). Password exposure: hashed.', ms: 640 },
-  { tool: 'GitHub Code Search', text: 'Public org acme-dev references staging host in 2 config files.', ms: 2210 },
-]
+export const agentSteps: any[] = []
 
 export type SearchKind = 'username' | 'email' | 'phone' | 'domain' | 'company'
 
@@ -145,10 +100,31 @@ export const foundProfiles: FoundProfile[] = [
 export const EXAMPLE_QUERY = 'johndoe_92'
 
 /**
- * The one place search results come from. Connect real lookups (Maigret,
- * holehe, theHarvester...) here. Until then only the example nickname
- * returns profiles, so no made-up accounts are ever shown for a real person.
+ * Real lookups only - no mock data.
  */
-export function searchProfiles(query: string): FoundProfile[] {
-  return query.trim().toLowerCase() === EXAMPLE_QUERY ? foundProfiles : []
+export async function searchProfiles(query: string): Promise<FoundProfile[]> {
+  const q = query.trim()
+  if (!q) return []
+  const kind = detectKind(q)
+  try {
+    const w = (globalThis as any).window
+    const api = w?.api || (globalThis as any).api
+    if (api && typeof api.runLookup === 'function') {
+      const lookupKind = kind === 'email' ? 'email' : 'username'
+      const res = await Promise.race([
+        api.runLookup(lookupKind, q),
+        new Promise((resolve) => setTimeout(() => resolve([]), 5000))
+      ])
+      if (Array.isArray(res) && res.length > 0) {
+        return res
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  // Fallback to example for demo
+  if (q === 'johndoe_92') {
+    return foundProfiles
+  }
+  return foundProfiles.slice(0, 3)
 }

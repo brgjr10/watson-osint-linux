@@ -60,18 +60,26 @@ const zoomActions = [
 
 export default function CaseView() {
   const { id } = useParams()
-  const c = cases.find((x) => x.id === id) ?? cases[0]
+  const c = cases.find((x: CaseRow) => x.id === id) ?? cases[0]
   const [selected, setSelected] = useState('sub1')
-  const node = caseGraph.nodes.find((n) => n.id === selected)!
+  const node = caseGraph.nodes.find((n: any) => n.id === selected)
+  if (!node) {
+    return (
+      <div className="mx-auto max-w-[760px] px-5 pb-16 pt-8">
+        <h1 className="text-[28px] font-semibold">Case not available</h1>
+        <p className="mt-2 text-[15px] text-fog">No case data available.</p>
+      </div>
+    )
+  }
   const d = details[selected] ?? {
     rows: [
       ['Type', node.kind],
-      ['Linked items', String(caseGraph.edges.filter((e) => e.from === selected || e.to === selected).length)],
+      ['Linked items', String(caseGraph.edges.filter((e: any) => e.from === selected || e.to === selected).length)],
     ],
     sources: ['WHOIS / RDAP'],
-    note: node.risk ? riskNote[node.risk] : 'Nothing unusual found yet.',
+    note: node.risk ? (riskNote as any)[node.risk] : 'Nothing unusual found yet.',
   }
-  const NodeIcon = kindIcon[node.kind]
+  const NodeIcon = (kindIcon as any)[node.kind]
 
   return (
     <div className="flex flex-col xl:h-full">

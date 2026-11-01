@@ -3,16 +3,13 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import {
   CaretDown as ChevronDown,
   CaretRight as ChevronRight,
-  ClockCounterClockwise as Clock,
-  Folders as FolderSearch,
+  Clock,
   List as Menu,
   MagnifyingGlass as Search,
-  GearSix as Settings,
   Wrench,
   X,
 } from '@phosphor-icons/react'
 import { Logo } from '../../components/Logo'
-import { cases } from '../../data/mock'
 
 // Inside the desktop app the window has no native title bar, so our own
 // toolbar doubles as the drag area and leaves room for the OS window controls.
@@ -27,7 +24,6 @@ const nav: NavItem[] = [
 ]
 
 const advanced: NavItem[] = [
-  { to: '/app/cases/WT-1042', label: 'Cases', icon: FolderSearch },
   { to: '/app/toolkit', label: 'Sources', icon: Wrench },
 ]
 
@@ -36,7 +32,6 @@ const titles: [RegExp, string, boolean][] = [
   [/^\/app\/?$/, 'Search', false],
   [/^\/app\/results/, 'Results', true],
   [/^\/app\/history/, 'History', false],
-  [/^\/app\/cases/, 'Case', true],
   [/^\/app\/toolkit/, 'Sources', false],
 ]
 
@@ -105,9 +100,6 @@ export default function AppLayout() {
 
         <div className="mt-auto space-y-1 p-2.5">
           <p className="px-2.5 pb-1 text-[12px] leading-snug text-fog">Free forever. No account needed.</p>
-          <button className="flex h-8 w-full items-center gap-2.5 rounded-lg px-2.5 text-[14px] text-paper-dim transition-colors hover:bg-white/[0.05]">
-            <Settings className="size-4 text-fog" /> Settings
-          </button>
         </div>
       </aside>
       {open && <div className="fixed inset-0 z-30 bg-black/60 lg:hidden" onClick={() => setOpen(false)} />}
@@ -190,7 +182,6 @@ function QuickFind({ onClose }: { onClose: () => void }) {
         to: `/app/results?q=${encodeURIComponent(q)}`,
       })),
     },
-    { h: 'Cases', items: cases.slice(0, 3).map((c) => ({ label: c.title, to: `/app/cases/${c.id}` })) },
   ]
 
   return (
@@ -205,8 +196,8 @@ function QuickFind({ onClose }: { onClose: () => void }) {
         <Search className="size-5 text-fog" />
         <input
           autoFocus
-          aria-label="Search history and cases"
-          placeholder="Search history and cases"
+          aria-label="Search history"
+          placeholder="Search history"
           className="h-9 flex-1 bg-transparent text-[17px] outline-none placeholder:text-fog"
         />
       </div>
