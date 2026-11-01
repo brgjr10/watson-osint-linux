@@ -2,6 +2,22 @@
 
 All notable changes to Watson. One entry per public build.
 
+## 1.6.0 — 1 November 2026
+
+A stability release. The search flow is untouched; this build fixes the crashes and the rough edges reported since 1.5.0.
+
+### Fixes
+
+- The first search after boot no longer freezes for a few seconds while sources warm up.
+- Sources that answer with an empty page are skipped instead of stalling the run.
+- The window remembers its size between runs again.
+- History entries keep their order after a restart.
+
+### Design
+
+- The status line clears once a search finishes, instead of keeping the last count.
+- Sharper icons on high-DPI screens.
+
 ## 1.5.0 — 1 November 2026
 
 A start-up release. The search flow is unchanged; the Windows build is the part that moved.
