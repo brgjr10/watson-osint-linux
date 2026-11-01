@@ -2,6 +2,22 @@
 
 All notable changes to Watson. One entry per public build.
 
+## 1.5.0 — 1 November 2026
+
+A start-up release. The search flow is unchanged; the Windows build is the part that moved.
+
+### Fixes
+
+- The app installs once to `%LOCALAPPDATA%\Programs\Watson` instead of unpacking into a fresh temp folder on every run.
+- Long handles no longer push the status line off its row in the result list.
+- The identity score no longer counts accounts whose only match is a shared avatar.
+
+### Design
+
+- Query field, result list and footer share one grid.
+- The status line reports how many sources answered and the identity score, instead of a spinner that stayed on screen.
+- The last search is kept between runs.
+
 ## 1.4.0 — 29 October 2026
 
 A cleanup release. Nothing about the search flow changed; what changed is everything around it.
