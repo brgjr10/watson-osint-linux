@@ -131,9 +131,7 @@ export async function searchProfiles(query: string): Promise<FoundProfile[]> {
   } catch (e) {
     // ignore
   }
-  // Fallback to example for demo
-  if (q === 'johndoe_92') {
-    return foundProfiles
-  }
-  return foundProfiles.slice(0, 3)
+  // No fallback to mock data
+  return []
+
 }
