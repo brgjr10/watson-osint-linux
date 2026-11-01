@@ -122,7 +122,7 @@ export async function searchProfiles(query: string): Promise<FoundProfile[]> {
       const lookupKind = kind === 'email' ? 'email' : 'username'
       const res = await Promise.race([
         api.runLookup(lookupKind, q),
-        new Promise((resolve) => setTimeout(() => resolve([]), 5000))
+        new Promise((resolve) => setTimeout(() => resolve([]), 15000))
       ])
       if (Array.isArray(res) && res.length > 0) {
         return res
@@ -133,5 +133,6 @@ export async function searchProfiles(query: string): Promise<FoundProfile[]> {
   }
   // No fallback to mock data
   return []
+
 
 }
