@@ -43,7 +43,12 @@ export const tools: Tool[] = [
   { name: 'Amass', category: 'Infrastructure', description: 'In-depth attack surface mapping', license: 'Open source', status: 'available', runs: 0 },
   { name: 'Social Analyzer', category: 'Identity', description: 'Find profiles across 1000+ sites', license: 'Open source', status: 'available', runs: 0 },
   { name: 'Web Check', category: 'Infrastructure', description: 'Website OSINT and tech stack analysis', license: 'Open source', status: 'available', runs: 0 },
-  { name: 'Awesome OSINT', category: 'Web & archive', description: 'Curated OSINT resources', license: 'Open source', status: 'available', runs: 0 },
+  { name: 'HaveIBeenPwned', category: 'Identity', description: 'Data breach checker', license: 'Freemium', status: 'available', runs: 0 },
+  { name: 'Shodan', category: 'Infrastructure', description: 'Internet-connected device search', license: 'Freemium', status: 'available', runs: 0 },
+  { name: 'VirusTotal', category: 'Threat intel', description: 'File/URL/domain reputation', license: 'Freemium', status: 'available', runs: 0 },
+  { name: 'Wayback Machine', category: 'Web & archive', description: 'Internet archive search', license: 'Free', status: 'available', runs: 0 },
+  { name: 'crt.sh', category: 'Infrastructure', description: 'Certificate transparency logs', license: 'Free', status: 'available', runs: 0 },
+  { name: 'Hunter.io', category: 'Corporate', description: 'Email finder and verifier', license: 'Freemium', status: 'available', runs: 0 },
 ]
 
 export interface CaseRow {
