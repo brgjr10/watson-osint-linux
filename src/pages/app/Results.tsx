@@ -26,10 +26,11 @@ export default function Results() {
     if (q) {
       try { addHistory(q) } catch {}
     }
-    setProgress(10)
+    setProgress(5)
     setLoading(true)
     setProfiles([])
-    const t = setInterval(() => setProgress((p) => Math.min(99, p + 40)), 10)
+    let p = 5
+    const t = setInterval(() => { p = Math.min(90, p + 5); setProgress(p) }, 500)
     searchProfiles(q).then((res) => {
       setProfiles(Array.isArray(res) ? res : [])
       setLoading(false)
