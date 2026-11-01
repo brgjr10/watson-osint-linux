@@ -26,25 +26,30 @@ export default function Results() {
     if (q) {
       try { addHistory(q) } catch {}
     }
-    setProgress(2)
+    setProgress(0)
     setLoading(true)
     setProfiles([])
-    let p = 2
-    const t = setInterval(() => { p = Math.min(95, p + Math.floor(Math.random() * 8) + 2); setProgress(p) }, 200)
+    const start = Date.now()
+    const t = setInterval(() => {
+      const elapsed = Date.now() - start
+      // simulate progress that goes to ~95% over 30s, then waits for real result
+      const p = Math.min(95, Math.floor((elapsed / 30000) * 95))
+      setProgress(p > 0 ? p : 1)
+    }, 250)
     searchProfiles(q).then((res) => {
       clearInterval(t)
       setProgress(100)
       setTimeout(() => {
         setProfiles(Array.isArray(res) ? res : [])
         setLoading(false)
-      }, 300)
+      }, 150)
     }).catch(() => {
       clearInterval(t)
       setProgress(100)
       setTimeout(() => {
         setProfiles([])
         setLoading(false)
-      }, 300)
+      }, 150)
     })
     return () => clearInterval(t)
   }, [q])
