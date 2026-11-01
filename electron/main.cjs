@@ -68,7 +68,7 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
   const connections = []
   try {
     if (kind === 'username') {
-      const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '50', '--dns-resolver', 'threaded', '-n', '1', '--timeout', '15'], 120000)
+      const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '30', '--dns-resolver', 'threaded', '-n', '2', '--timeout', '15'], 90000)
       const extracted = extractAll(out)
       for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
       for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'maigret'})
