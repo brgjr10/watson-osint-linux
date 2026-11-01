@@ -72,6 +72,72 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
       const extracted = extractAll(out)
       for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
       for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'maigret'})
+      const nameMatches = out.match(/fullname:\s*(.+)/gi) || []
+      for (const nm of nameMatches) {
+        const v = nm.replace(/fullname:\s*/i,'').trim()
+        if (v && v.length > 2 && !v.includes('http')) connections.push({type: 'name', value: v, source: 'maigret'})
+      }
+      for (const url of extracted.urls) {
+        try {
+          if (/patreon\.com\/soxoj|googleapis|gstatic|akamai|cloudfront|fbcdn|tiktokcdn|twimg|githubusercontent/.test(url)) continue
+          const u = new URL(url)
+          let site = u.hostname.replace(/^www\./,'')
+          if (/soundcloud/.test(site)) site = 'SoundCloud'
+          else if (/github\.com/.test(site)) site = 'GitHub'
+          else if (/gitlab/.test(site)) site = 'GitLab'
+          else if (/reddit/.test(site)) site = 'Reddit'
+          else if (/facebook\.com|^fb\.com$/.test(site)) site = 'Facebook'
+          else if (/tiktok\.com/.test(site)) site = 'TikTok'
+          else if (/gravatar/.test(site)) site = 'Gravatar'
+          else if (/imgur\.com/.test(site)) site = 'Imgur'
+          else if (/snapchat/.test(site)) site = 'Snapchat'
+          else if (/steamcommunity/.test(site)) site = 'Steam'
+          else if (/gist\.github\.com/.test(site)) site = 'GitHubGist'
+          else {
+            const p2 = site.split('.')
+            if (p2.length < 2) continue
+            site = p2[p2.length-2].charAt(0).toUpperCase() + p2[p2.length-2].slice(1)
+          }
+          const k = site.toLowerCase()
+          if (site && !seen.has(k)) {
+            seen.add(k)
+            const uniqConns = Array.from(new Map(connections.map(c=>[c.type+':'+c.value,c])).values()).slice(0, 20)
+            results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'username match', match: 'exact', url, username: query, connections: uniqConns })
+          }
+        } catch {}
+      }
+    } else if (kind === 'email') {
+      const { out } = await runCmd('/home/brgjr10/.local/bin/holehe', [query], 90000)
+      const extracted = extractAll(out)
+      for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'holehe'})
+      for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'holehe'})
+      for (const line of out.split('\n')) {
+        const m = line.match(/\[\+\]\s*(.+)/)
+        if (m) {
+          const site = m[1].trim()
+          if (site && !seen.has(site.toLowerCase())) {
+            seen.add(site.toLowerCase())
+            const uniqConns = Array.from(new Map(connections.map(c=>[c.type+':'+c.value,c])).values()).slice(0, 20)
+            results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'email registered', match: 'likely', emails: [query], connections: uniqConns })
+          }
+        }
+      }
+    }
+  } catch (e) {}
+  try { fs.appendFileSync('/tmp/lookup.log', JSON.stringify({count: results.length, query, kind}) + '\n'); } catch (e) {}
+  return results
+})
+
+ipcMain.handle('lookup', async (_e, kind, query) => {
+  const results = []
+  const seen = new Set()
+  const connections = []
+  try {
+    if (kind === 'username') {
+      const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '30', '--dns-resolver', 'threaded', '-n', '2', '--timeout', '15'], 90000)
+      const extracted = extractAll(out)
+      for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
+      for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'maigret'})
       // extract names/fullnames
       const nameMatches = out.match(/fullname:\s*(.+)/gi) || []
       for (const nm of nameMatches) {
