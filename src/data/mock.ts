@@ -37,10 +37,13 @@ export interface Tool {
 export const tools: Tool[] = [
   { name: 'Maigret', category: 'Identity', description: 'Username enumeration across sites', license: 'Open source', status: 'connected', runs: 0 },
   { name: 'Holehe', category: 'Identity', description: 'Email account discovery', license: 'Open source', status: 'connected', runs: 0 },
-  { name: 'Sherlock', category: 'Identity', description: 'Username search across social networks', license: 'Open source', status: 'available', runs: 0 },
+  { name: 'Sherlock', category: 'Identity', description: 'Username search across social networks', license: 'Open source', status: 'connected', runs: 0 },
   { name: 'WhatsMyName', category: 'Identity', description: 'Username OSINT tool', license: 'Open source', status: 'available', runs: 0 },
   { name: 'Subfinder', category: 'Infrastructure', description: 'Subdomain discovery', license: 'Open source', status: 'available', runs: 0 },
   { name: 'Amass', category: 'Infrastructure', description: 'In-depth attack surface mapping', license: 'Open source', status: 'available', runs: 0 },
+  { name: 'Social Analyzer', category: 'Identity', description: 'Find profiles across 1000+ sites', license: 'Open source', status: 'available', runs: 0 },
+  { name: 'Web Check', category: 'Infrastructure', description: 'Website OSINT and tech stack analysis', license: 'Open source', status: 'available', runs: 0 },
+  { name: 'Awesome OSINT', category: 'Web & archive', description: 'Curated OSINT resources', license: 'Open source', status: 'available', runs: 0 },
 ]
 
 export interface CaseRow {
