@@ -85,14 +85,16 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
           if (/soundcloud/.test(site)) site = 'SoundCloud'
           else if (/github\.com/.test(site)) site = 'GitHub'
           else if (/gitlab/.test(site)) site = 'GitLab'
-          else if (/reddit/.test(site)) site = 'Reddit'
+          else if (/reddit\.com/.test(site)) site = 'Reddit'
           else if (/facebook\.com|^fb\.com$/.test(site)) site = 'Facebook'
           else if (/tiktok\.com/.test(site)) site = 'TikTok'
           else if (/gravatar/.test(site)) site = 'Gravatar'
           else if (/imgur\.com/.test(site)) site = 'Imgur'
           else if (/snapchat/.test(site)) site = 'Snapchat'
-          else if (/steamcommunity/.test(site)) site = 'Steam'
+          else if (/steamcommunity\.com/.test(site)) site = 'Steam'
           else if (/gist\.github\.com/.test(site)) site = 'GitHubGist'
+          else if (/sndcdn/.test(site)) continue
+          else if (/rapidproxy/.test(site)) continue
           else {
             const p2 = site.split('.')
             if (p2.length < 2) continue
