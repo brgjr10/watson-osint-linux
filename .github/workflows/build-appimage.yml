@@ -32,10 +32,15 @@ jobs:
       - name: Build AppImage
         run: npx --yes electron-builder --linux AppImage --publish never
 
+      - name: List outputs
+        run: find . -name "*.AppImage" -o -path "*/release/*" | head -20
+
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
+            release/*.AppImage
+            release/*.AppImage.*
             dist/*.AppImage
             dist/*.AppImage.*
           draft: false
