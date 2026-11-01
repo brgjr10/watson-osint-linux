@@ -48,18 +48,26 @@ function runCmd(cmd, args, timeoutMs) {
 
 function extractAll(text) {
   const urls = text.match(/https?:\/\/[^\s\)\]\"]+/gi) || []
-  const emails = text.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) || []
-  const phones = text.match(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g) || []
+  const emails = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []
+  const phones = []
+  const phonePatterns = [
+    /\+\d{1,3}[\s.-]?\(?\d{2,4}\)?[\s.-]?\d{3,4}[\s.-]?\d{3,4}/g,
+    /\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}/g,
+    /\b\d{3}[\s.-]\d{3}[\s.-]\d{4}\b/g
+  ]
+  for (const p of phonePatterns) {
+    const m = text.match(p) || []
+    for (const x of m) {
+      const digits = x.replace(/\D/g,'')
+      if(digits.length >= 10 && digits.length <= 15 && !(digits.startsWith('20') && digits.length === 4)) {
+        if(x.includes('+') || digits.length === 10) phones.push(x.trim())
+      }
+    }
+  }
   return { 
     urls, 
     emails: Array.from(new Set(emails)), 
-    phones: Array.from(new Set(phones)).filter(p => {
-      const digits = p.replace(/\D/g,'')
-      if(digits.length < 7 || digits.length > 15) return false
-      if(digits.length === 10 || digits.length === 11) return true
-      if(digits.length >= 12 && digits.length <= 15 && p.includes('+')) return true
-      return false
-    }) 
+    phones: Array.from(new Set(phones)) 
   }
 }
 
