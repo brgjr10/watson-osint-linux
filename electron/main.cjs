@@ -17,7 +17,6 @@ function createWindow() {
     webPreferences: { contextIsolation: true, sandbox: false, preload: path.join(__dirname, 'preload.cjs') },
   })
 
-  // Links to the outside world open in the user's browser, not inside the app.
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }
@@ -27,8 +26,6 @@ function createWindow() {
   win.loadFile(path.join(__dirname, '..', 'dist', 'app.html'), { hash: '/app' })
 }
 
-// Role menus keep zoom (Ctrl/Cmd +/-/0) and copy/paste shortcuts working;
-// autoHideMenuBar keeps the bar itself out of sight on Windows.
 Menu.setApplicationMenu(
   Menu.buildFromTemplate([
     ...(process.platform === 'darwin' ? [{ role: 'appMenu' }] : []),
@@ -36,8 +33,6 @@ Menu.setApplicationMenu(
     { role: 'viewMenu' },
   ]),
 )
-
-
 
 function runCmd(cmd, args, timeoutMs) {
   return new Promise((resolve) => {
@@ -58,6 +53,15 @@ function extractAll(text) {
   return { urls, emails: Array.from(new Set(emails)), phones: Array.from(new Set(phones)) }
 }
 
+function categorizeSite(site) {
+  const s = site.toLowerCase()
+  if (/github|gitlab|stackoverflow|dev\.to|npm|docker/.test(s)) return 'Dev'
+  if (/reddit|4chan|habr|forum/.test(s)) return 'Forums'
+  if (/steam|twitch|xbox|psn|chess\.com/.test(s)) return 'Gaming'
+  if (/youtube|soundcloud|medium|pinterest|imgur/.test(s)) return 'Media'
+  return 'Social'
+}
+
 ipcMain.handle('lookup', async (_e, kind, query) => {
   const results = []
   const seen = new Set()
@@ -65,10 +69,10 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
   try {
     if (kind === 'username') {
       const { out } = await runCmd('timeout', ['30', 'python3', '-m', 'maigret', query, '--top-sites', '50'], 90000)
-      const { urls, emails, phones } = extractAll(out)
-      for (const e of emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
-      for (const p of phones) connections.push({type: 'phone', value: p, source: 'maigret'})
-      for (const url of urls) {
+      const extracted = extractAll(out)
+      for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
+      for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'maigret'})
+      for (const url of extracted.urls) {
         try {
           const u = new URL(url)
           let site = u.hostname.replace(/^www\./,'')
@@ -96,9 +100,9 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
       }
     } else if (kind === 'email') {
       const { out } = await runCmd('python3', ['-m', 'holehe', query], 60000)
-      const { urls, emails, phones } = extractAll(out)
-      for (const e of emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'holehe'})
-      for (const p of phones) connections.push({type: 'phone', value: p, source: 'holehe'})
+      const extracted = extractAll(out)
+      for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'holehe'})
+      for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'holehe'})
       for (const line of out.split('\n')) {
         const m = line.match(/\[\+\]\s*(\S+)/)
         if (m) {
@@ -110,20 +114,9 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
         }
       }
     }
-  } catch (e) {
-    // ignore
-  }
+  } catch (e) {}
   try { fs.appendFileSync('/tmp/lookup.log', JSON.stringify({count: results.length, query, kind}) + '\n'); } catch (e) {}
   return results
-}
-
-function categorizeSite(site) {
-  const s = site.toLowerCase()
-  if (/github|gitlab|stackoverflow|dev\.to|npm|docker/.test(s)) return 'Dev'
-  if (/reddit|4chan|habr|forum/.test(s)) return 'Forums'
-  if (/steam|twitch|xbox|psn|chess\.com/.test(s)) return 'Gaming'
-  if (/youtube|soundcloud|medium|pinterest|imgur/.test(s)) return 'Media'
-  return 'Social'
 })
 
 app.whenReady().then(() => {
