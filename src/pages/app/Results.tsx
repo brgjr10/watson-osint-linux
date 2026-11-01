@@ -135,7 +135,39 @@ export default function Results() {
         </div>
       )}
 
-      {/* Grouped list */}
+      {/* Connections */}
+      {done && profiles.length > 0 && (
+        (() => {
+          const allConns: Array<{type:string,value:string,source?:string,site?:string}> = []
+          for (const p of profiles) {
+            if (p.connections) {
+              for (const c of p.connections) {
+                allConns.push({...c, site: p.site})
+              }
+            }
+            if (p.emails) for (const e of p.emails) allConns.push({type:'email', value:e, site:p.site})
+            if (p.phones) for (const ph of p.phones) allConns.push({type:'phone', value:ph, site:p.site})
+          }
+          const uniq = Array.from(new Map(allConns.map(c=>[c.type+':'+c.value,c])).values())
+          if (uniq.length === 0) return null
+          return (
+            <section className="mt-6 rounded-2xl border border-transparent bg-ink-850 p-5 ring-1 ring-white/[0.06]">
+              <h2 className="text-[15px] font-semibold">Connections</h2>
+              <p className="mt-1 text-[13px] text-fog">Connected data found across results</p>
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                {uniq.map((c, idx) => (
+                  <div key={idx} className="rounded-lg border border-white/[0.06] p-3">
+                    <div className="text-[12px] text-fog capitalize">{c.type}</div>
+                    <div className="text-[14px] break-all">{c.value}</div>
+                    {c.source && <div className="text-[11px] text-fog-dim mt-1">From {c.source}</div>}
+                    {c.site && <div className="text-[11px] text-fog-dim">Seen on {c.site}</div>}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )
+        })()
+      )}
       {list.length > 0 && (
         <ul className="mt-4 overflow-hidden rounded-2xl border border-transparent bg-ink-850 ring-1 ring-white/[0.06]">
           {list.map((p, i) => (
