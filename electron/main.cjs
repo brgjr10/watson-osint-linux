@@ -86,12 +86,12 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
   const connections = []
   try {
     if (kind === 'username') {
-      const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '30', '--dns-resolver', 'threaded', '-n', '2', '--timeout', '15'], 90000)
-      const { out: out2 } = await runCmd('/home/brgjr10/.local/bin/sherlock', [query, '--timeout', '10', '--no-color'], 60000)
+      const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '100', '--dns-resolver', 'threaded', '-n', '3', '--timeout', '20'], 180000)
+      const { out: out2 } = await runCmd('/home/brgjr10/.local/bin/sherlock', [query, '--timeout', '15', '--no-color'], 90000)
       const combined = out + '\n' + out2
       const extracted = extractAll(combined)
-      for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
-      for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'maigret'})
+      for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'combined'})
+      for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'combined'})
       const nameMatches = combined.match(/fullname:\s*(.+)/gi) || []
       for (const nm of nameMatches) {
         const v = nm.replace(/fullname:\s*/i,'').trim()
