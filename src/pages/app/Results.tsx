@@ -9,7 +9,7 @@ import { addHistory } from '../../lib/history'
 
 const stages = ['Checking social networks', 'Checking forums', 'Checking developer sites', 'Checking games and media', 'Putting it together']
 const groups: ('All' | PlatformGroup)[] = ['All', 'Social', 'Dev', 'Gaming', 'Forums', 'Media']
-const SITES = 3100
+const SITES = 7793
 
 export default function Results() {
   const [params] = useSearchParams()
