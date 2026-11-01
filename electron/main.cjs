@@ -79,10 +79,12 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
   try {
     if (kind === 'username') {
       const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '30', '--dns-resolver', 'threaded', '-n', '2', '--timeout', '15'], 90000)
-      const extracted = extractAll(out)
+      const { out: out2 } = await runCmd('/home/brgjr10/.local/bin/sherlock', [query, '--timeout', '10', '--no-color'], 60000)
+      const combined = out + '\n' + out2
+      const extracted = extractAll(combined)
       for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
       for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'maigret'})
-      const nameMatches = out.match(/fullname:\s*(.+)/gi) || []
+      const nameMatches = combined.match(/fullname:\s*(.+)/gi) || []
       for (const nm of nameMatches) {
         const v = nm.replace(/fullname:\s*/i,'').trim()
         if (v && v.length > 2 && v.length < 60 && !/[0-9]/.test(v) && !v.includes('http') && !/avatar|image|count|id|uid/i.test(v)) connections.push({type: 'name', value: v, source: 'maigret'})
