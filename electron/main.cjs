@@ -180,6 +180,18 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
             addResult(site, categorizeSite(site), 'username match', 'exact', { url, connections: connections.slice(0,20) })
           } catch {}
         }
+      // GitHub user search
+      try {
+        const { out } = await runCmd('curl', ['-s', '-m', '20', '-H', 'Accept: application/vnd.github+json', `https://api.github.com/users/${encodeURIComponent(query)}`], 30000)
+        try {
+          const j = JSON.parse(out)
+          if (j && j.login) {
+            addResult('GitHub', 'Dev', j.bio || 'GitHub profile', 'exact', { url: j.html_url, name: j.name, location: j.location, bio: j.bio, since: j.created_at ? String(j.created_at).slice(0,4) : '' })
+            if (j.email) connections.push({type:'email', value:j.email, source:'github'})
+            if (j.blog) connections.push({type:'url', value:j.blog, source:'github'})
+          }
+        } catch {}
+      } catch {}
       } catch {}
     } else if (kind === 'email') {
       try {
@@ -191,6 +203,18 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
             if (site) addResult(site, categorizeSite(site), 'email registered', 'likely', { emails: [query], connections: connections.slice(0,20) })
           }
         }
+      // HIBP breach check (public, no key for count)
+      try {
+        const { out } = await runCmd('curl', ['-s', '-m', '20', '-H', 'hibp-api-key: 00000000000000000000000000000000', `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(query)}?truncateResponse=false`], 30000)
+        if (out && out.trim().startsWith('[')) {
+          try {
+            const arr = JSON.parse(out)
+            for (const b of (Array.isArray(arr)?arr:[]).slice(0,20)) {
+              addResult(b.Name || 'Breach', 'Threat intel', `breached: ${b.Title || b.Name}`, 'likely', { since: b.BreachDate ? String(b.BreachDate).slice(0,4) : '', url: `https://haveibeenpwned.com` })
+            }
+          } catch {}
+        }
+      } catch {}
         const ex = extractAll(out)
         for (const e of ex.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type:'email',value:e,source:'holehe'})
         for (const ph of ex.phones) connections.push({type:'phone',value:ph,source:'holehe'})
@@ -219,6 +243,19 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
           const j = JSON.parse(out)
           if (j && j.archived_snapshots && j.archived_snapshots.closest) {
             addResult('Wayback Machine', 'Web & archive', 'historical snapshots available', 'likely', { url: j.archived_snapshots.closest.url })
+          }
+        } catch {}
+      } catch {}
+      // WHOIS via rdap
+      try {
+        const { out } = await runCmd('curl', ['-s', '-m', '20', `https://rdap.org/domain/${encodeURIComponent(query)}`], 30000)
+        try {
+          const j = JSON.parse(out)
+          const ns = (j.nameservers||[]).map(n=>n.ldhName).filter(Boolean)
+          if (ns.length) addResult('RDAP/WHOIS', 'Infrastructure', `nameservers: ${ns.slice(0,3).join(', ')}`, 'exact', { url: `https://rdap.org/domain/${query}` })
+          if (j.events) {
+            const reg = j.events.find(e=>e.eventAction==='registration')
+            if (reg) addResult(query, 'Infrastructure', `registered ${String(reg.eventDate).slice(0,10)}`, 'exact', {})
           }
         } catch {}
       } catch {}
