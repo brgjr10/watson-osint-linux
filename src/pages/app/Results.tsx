@@ -144,6 +144,15 @@ export default function Results() {
             <button onClick={() => navigator.clipboard?.writeText(profiles.map(p=>p.site+' '+p.url).join('\n'))} className="flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-[15px] font-medium text-paper transition-colors hover:bg-white/5">
               Copy
             </button>
+            <button onClick={() => {
+              const emails = Array.from(new Set(profiles.flatMap((p:any)=>p.emails||[])))
+              const phones = Array.from(new Set(profiles.flatMap((p:any)=>p.phones||[])))
+              const names = Array.from(new Set(profiles.map((p:any)=>p.name).filter(Boolean)))
+              const txt = `Query: ${q}\nNames: ${names.join(', ')}\nEmails: ${emails.join(', ')}\nPhones: ${phones.join(', ')}\nSites: ${profiles.length}`
+              navigator.clipboard?.writeText(txt)
+            }} className="flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-[15px] font-medium text-paper transition-colors hover:bg-white/5">
+              Copy dossier
+            </button>
             <button onClick={async () => {
               try {
                 const cases = await (window as any).api?.loadCases?.() || []
