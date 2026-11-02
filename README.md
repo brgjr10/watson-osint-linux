@@ -15,8 +15,6 @@ Free OSINT tool for Linux — people search across public sites by nickname, ema
 - **Sources panel**: View connected and available OSINT sources
 - **Dark UI**: Modern dark-themed interface built with React and Tailwind CSS
 
-<img width="1440" height="900" alt="image" src="https://github.com/user-attachments/assets/59161ba0-afaf-4cbf-b0a1-61bc2c8a6ff9" />
-
 <img width="960" height="600" alt="image" src="https://github.com/user-attachments/assets/7244c902-caab-4cdd-b966-95401d1e866a" />
 
 <img width="1280" height="800" alt="image" src="https://github.com/user-attachments/assets/ca8cdc7b-7b30-4575-b63a-be595db2532d" />
