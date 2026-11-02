@@ -144,7 +144,7 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
   try {
     if (kind === 'username') {
       try {
-        const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '50', '--timeout', '15'], 120000)
+        const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '100', '--timeout', '15'], 120000)
         const combined = out
         const extracted = extractAll(combined)
         for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
