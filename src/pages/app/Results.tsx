@@ -126,6 +126,14 @@ export default function Results() {
                 {bios.length>0 && <div><b className="text-paper">Bio:</b> {bios[0]}</div>}
                 {locs.length>0 && <div><b className="text-paper">Location:</b> {locs.join(', ')}</div>}
                 {links.length>0 && <div><b className="text-paper">Links:</b> {links.slice(0,5).join(' · ')}</div>}
+                {(() => {
+                  const emails = Array.from(new Set(profiles.flatMap((p:any)=>p.emails||[])))
+                  const phones = Array.from(new Set(profiles.flatMap((p:any)=>p.phones||[])))
+                  return (<>
+                    {emails.length>0 && <div><b className="text-paper">Emails:</b> {emails.join(', ')}</div>}
+                    {phones.length>0 && <div><b className="text-paper">Phones:</b> {phones.join(', ')}</div>}
+                  </>)
+                })()}
               </div>
             )
           })()}
