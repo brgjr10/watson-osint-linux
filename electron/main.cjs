@@ -259,7 +259,22 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
           }
         } catch {}
       } catch {}
+      // DNS resolution
+      try {
+        const { out } = await runCmd('bash', ['-c', `getent hosts ${query} || dig +short ${query} | head -5`], 15000)
+        const lines = out.trim().split('\n').filter(Boolean)
+        for (const l of lines.slice(0,5)) addResult(l.trim(), 'Infrastructure', 'DNS resolution', 'exact', {})
+      } catch {}
     } else if (kind === 'phone') {
+      // best-effort public lookup via phoneinfoga if installed
+      try {
+        const { out } = await runCmd('which', ['phoneinfoga'], 5000)
+        if (out.trim()) {
+          const r = await runCmd('phoneinfoga', ['scan', '-n', query], 60000)
+          const ex = extractAll(r.out)
+          for (const u of ex.urls) addResult(u, 'Social', 'phone footprint', 'likely', { url: u })
+        }
+      } catch {}
       // best-effort: no free reliable API; return empty gracefully
     } else if (kind === 'company') {
       // GLEIF legal entity search (public)
