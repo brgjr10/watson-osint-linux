@@ -114,6 +114,21 @@ export default function Results() {
             This {meta.label.toLowerCase()} is used on <b className="font-semibold">{profiles.length} public sites</b>.{' '}
             {same} of them look like the same person. {profiles.length - same} are name matches only.
           </p>
+          {(() => {
+            const names = Array.from(new Set(profiles.map((p:any)=>p.name).filter(Boolean)))
+            const bios = profiles.map((p:any)=>p.bio).filter(Boolean).slice(0,1)
+            const locs = Array.from(new Set(profiles.map((p:any)=>p.location).filter(Boolean)))
+            const links = Array.from(new Set(profiles.flatMap((p:any)=>p.links||[])))
+            if (!names.length && !bios.length && !locs.length && !links.length) return null
+            return (
+              <div className="mt-4 space-y-1 text-[13px] text-fog">
+                {names.length>0 && <div><b className="text-paper">Name:</b> {names.join(', ')}</div>}
+                {bios.length>0 && <div><b className="text-paper">Bio:</b> {bios[0]}</div>}
+                {locs.length>0 && <div><b className="text-paper">Location:</b> {locs.join(', ')}</div>}
+                {links.length>0 && <div><b className="text-paper">Links:</b> {links.slice(0,5).join(' · ')}</div>}
+              </div>
+            )
+          })()}
           <div className="mt-5 flex flex-wrap gap-2.5">
             <button onClick={() => window.print()} className="flex h-10 items-center gap-2 rounded-full bg-white px-4 text-[15px] font-medium text-black transition-colors hover:bg-white/85">
               <Download className="size-4" /> Save as PDF
