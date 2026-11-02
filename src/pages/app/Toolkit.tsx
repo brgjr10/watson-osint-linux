@@ -8,6 +8,13 @@ export default function Toolkit() {
   const [cat, setCat] = useState('All')
   const [q, setQ] = useState('')
   const [statuses, setStatuses] = useState<Record<string,string>>({})
+  const [custom, setCustom] = useState<any[]>([])
+  const handleAddCustom = () => {
+    const name = window.prompt('Source name')
+    if (!name) return
+    const cmd = window.prompt('Command to run (binary name)') || name
+    setCustom((c) => [...c, { name, category: 'Custom', description: cmd, license: 'Custom', status: 'available' }])
+  }
   useEffect(() => {
     let cancelled = false
     ;(async () => {
@@ -22,7 +29,7 @@ export default function Toolkit() {
     })()
     return () => { cancelled = true }
   }, [])
-  const list = tools.filter((t: any) => (cat === 'All' || t.category === cat) && t.name.toLowerCase().includes(q.toLowerCase()))
+  const list = [...(tools as any[]), ...custom].filter((t: any) => (cat === 'All' || t.category === cat) && t.name.toLowerCase().includes(q.toLowerCase()))
   const connected = tools.filter((t: any) => (statuses[t.name] || t.status) === 'connected').length
   const total = tools.length
 
@@ -32,7 +39,8 @@ export default function Toolkit() {
       const key = window.prompt(`Enter API key for ${name}`)
       if (key) await (window as any).api?.setApiKey?.(name, key)
     } else {
-      await (window as any).api?.connectSource?.(name)
+      const r = await (window as any).api?.connectSource?.(name)
+      alert(r?.msg || 'done')
     }
     // refresh
     const bin = name.toLowerCase().replace(/[^a-z0-9]/g,'')
@@ -47,7 +55,7 @@ export default function Toolkit() {
           <h1 className="text-[34px] font-semibold leading-[1.1] tracking-[-0.02em]">Sources</h1>
           <p className="mt-1 text-[15px] text-fog">{connected} of {total} sources connected. Watson picks the right ones for each search automatically.</p>
         </div>
-        <button className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-[13px] text-paper-dim hover:text-paper">
+        <button onClick={handleAddCustom} className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-[13px] text-paper-dim hover:text-paper">
           <Plus className="size-4" /> Add custom source
         </button>
       </div>
