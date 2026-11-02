@@ -94,6 +94,36 @@ ipcMain.handle('checkBinary', async (_e, name) => {
   return false
 })
 
+
+const INSTALL_CMDS = {
+  'Maigret': ['pip', ['install', '--user', 'maigret']],
+  'Holehe': ['pip', ['install', '--user', 'holehe']],
+  'Sherlock': ['pip', ['install', '--user', 'sherlock-project']],
+  'WhatsMyName': ['git', ['clone', 'https://github.com/WebBreacher/WhatsMyName.git', '/home/brgjr10/.local/share/watson/WhatsMyName']],
+  'Subfinder': ['go', ['install', 'github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest']],
+  'Amass': ['go', ['install', 'github.com/owasp-amass/amass/v4/...@master']],
+}
+
+ipcMain.handle('connectSource', async (_e, name) => {
+  const cfg = INSTALL_CMDS[name]
+  if (!cfg) return { ok: false, msg: 'No auto-installer; set API key or install manually.' }
+  const [cmd, args] = cfg
+  const r = await runCmd(cmd, args, 300000)
+  return { ok: !r.err, msg: (r.out + r.err).slice(-500) }
+})
+
+ipcMain.handle('setApiKey', async (_e, name, key) => {
+  const fs = require('node:fs')
+  const dir = '/home/brgjr10/.config/watson'
+  fs.mkdirSync(dir, { recursive: true })
+  const f = dir + '/keys.json'
+  let data = {}
+  try { data = JSON.parse(fs.readFileSync(f,'utf8')) } catch {}
+  data[name] = key
+  fs.writeFileSync(f, JSON.stringify(data, null, 2))
+  return { ok: true }
+})
+
 ipcMain.handle('lookup', async (_e, kind, query) => {
   const results = []
   const seen = new Set()

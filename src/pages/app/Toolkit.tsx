@@ -26,6 +26,20 @@ export default function Toolkit() {
   const connected = tools.filter((t: any) => (statuses[t.name] || t.status) === 'connected').length
   const total = tools.length
 
+  const handleConnect = async (name: string) => {
+    const apiSources = ['Shodan','VirusTotal','HaveIBeenPwned']
+    if (apiSources.includes(name)) {
+      const key = window.prompt(`Enter API key for ${name}`)
+      if (key) await (window as any).api?.setApiKey?.(name, key)
+    } else {
+      await (window as any).api?.connectSource?.(name)
+    }
+    // refresh
+    const bin = name.toLowerCase().replace(/[^a-z0-9]/g,'')
+    const ok = await (window as any).api?.checkBinary?.(bin)
+    setStatuses((prev) => ({ ...prev, [name]: ok ? 'connected' : (prev[name] || 'available') }))
+  }
+
   return (
     <div className="mx-auto max-w-6xl px-5 pb-16 pt-8 sm:px-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -68,6 +82,7 @@ export default function Toolkit() {
               </div>
               <div className="mt-1 text-[13px] text-fog">{t.description}</div>
               <div className="mt-3 text-[12px] text-fog-dim">{t.category} · {t.license}</div>
+              <button onClick={() => handleConnect(t.name)} className="mt-3 rounded-md border border-white/10 px-2 py-1 text-[12px] text-paper-dim hover:text-paper">Connect</button>
             </div>
           ))}
         </div>
