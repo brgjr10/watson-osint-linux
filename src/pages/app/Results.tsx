@@ -103,6 +103,7 @@ export default function Results() {
             Check the spelling, or try a different nickname, email, phone number or website.
             For phone lookups, connect a provider in Sources.
           </p>
+          <button onClick={() => window.location.reload()} className="mt-4 rounded-lg border border-white/10 px-3 py-1.5 text-[13px] text-paper-dim hover:text-paper">Retry</button>
         </section>
       ) : (
         <section className="animate-fade-up mt-8 rounded-2xl border border-transparent bg-ink-850 p-5 ring-1 ring-white/[0.06]">
