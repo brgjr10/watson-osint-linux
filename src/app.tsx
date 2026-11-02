@@ -9,6 +9,7 @@ import Search from './pages/app/Search'
 import Results from './pages/app/Results'
 import History from './pages/app/History'
 import Toolkit from './pages/app/Toolkit'
+import Cases from './pages/app/Cases'
 
 // This entry only ever runs inside the desktop window, which loads from file://.
 createRoot(document.getElementById('root')!).render(
@@ -23,6 +24,8 @@ createRoot(document.getElementById('root')!).render(
             <Route path="results" element={<Results />} />
             <Route path="history" element={<History />} />
             <Route path="toolkit" element={<Toolkit />} />
+            <Route path="cases" element={<Cases />} />
+            <Route path="case/:id" element={<Cases />} />
           </Route>
           <Route path="*" element={<Navigate to="/app" replace />} />
         </Routes>
