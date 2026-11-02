@@ -3,3 +3,4 @@ dist
 release
 screenshots
 *.tsbuildinfo
+reports
