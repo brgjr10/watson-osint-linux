@@ -1,0 +1,2 @@
+- watson_report.md - Full breakdown of the project. Architecture, data layer (everything is mock except detectKind()), components/pages status, IPC setup (broken), data flow (all fake), external deps. Verdict: ~90% UI/UX, ~0% real OSINT functionality connected.
+- watson_bug_report.md - Bugs found. Critical: IPC not wired to renderer (BUG-001), searchProfiles() ignores query and returns mocks (BUG-002), IPC handler doesn't return results (BUG-006). Medium: fake progress animation, hardcoded summary. Includes verification commands and fix priority.
