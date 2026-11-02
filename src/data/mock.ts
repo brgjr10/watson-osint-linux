@@ -1,4 +1,4 @@
-// Built-in example data used by the screens until real lookups are connected.
+// Type definitions and helpers for OSINT lookups.
 
 export type EntityKind = 'domain' | 'company' | 'email' | 'ip' | 'person' | 'username' | 'cert' | 'leak' | 'repo'
 
@@ -108,20 +108,6 @@ export interface FoundProfile {
   connections?: Array<{type: string, value: string, source?: string}>
 }
 
-export const foundProfiles: FoundProfile[] = [
-  { site: 'GitHub', group: 'Dev', since: '2019', hue: '#a78bfa', detail: '23 public repos', match: 'exact' },
-  { site: 'Reddit', group: 'Forums', since: '2018', hue: '#ff7a45', detail: '1.2k karma', match: 'exact' },
-  { site: 'Steam', group: 'Gaming', since: '2016', hue: '#5eead4', detail: 'Level 34', match: 'exact' },
-  { site: 'Twitch', group: 'Gaming', since: '2020', hue: '#c084fc', detail: '84 followers', match: 'likely' },
-  { site: 'Medium', group: 'Media', since: '2021', hue: '#ede6d6', detail: '6 articles', match: 'exact' },
-  { site: 'Telegram', group: 'Social', since: '2020', hue: '#60a5fa', detail: 'Public username', match: 'likely' },
-  { site: 'Pinterest', group: 'Social', since: '2017', hue: '#ff6b6b', detail: '3 boards', match: 'likely' },
-  { site: 'Stack Overflow', group: 'Dev', since: '2019', hue: '#f2b544', detail: '412 reputation', match: 'exact' },
-  { site: 'Chess.com', group: 'Gaming', since: '2022', hue: '#86efac', detail: 'Rapid 1340', match: 'exact' },
-  { site: 'SoundCloud', group: 'Media', since: '2015', hue: '#fb923c', detail: '2 tracks', match: 'likely' },
-  { site: 'Habr', group: 'Forums', since: '2020', hue: '#7dd3fc', detail: 'Reader', match: 'likely' },
-  { site: 'Docker Hub', group: 'Dev', since: '2021', hue: '#38bdf8', detail: '4 images', match: 'exact' },
-]
 
 export const EXAMPLE_QUERY = 'johndoe_92'
 

@@ -12,7 +12,7 @@ const groups: ('All' | PlatformGroup)[] = ['All', 'Social', 'Dev', 'Gaming', 'Fo
 
 export default function Results() {
   const [params] = useSearchParams()
-  const q = params.get('q') ?? 'johndoe_92'
+  const q = params.get('q') ?? ''
   const meta = kindMeta[detectKind(q)]
   const [progress, setProgress] = useState(0)
   const [filter, setFilter] = useState<(typeof groups)[number]>('All')
