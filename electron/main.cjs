@@ -81,6 +81,11 @@ function categorizeSite(site) {
 }
 
 ipcMain.handle('checkBinary', async (_e, name) => {
+  const fs = require('node:fs')
+  try {
+    const data = JSON.parse(fs.readFileSync('/home/brgjr10/.config/watson/keys.json','utf8'))
+    if (data && data[name]) return true
+  } catch {}
   const candidates = [name, name.toLowerCase()]
   for (const c of candidates) {
     try { execFileSync('which', [c], { stdio: 'ignore' }); return true } catch {}
@@ -88,7 +93,7 @@ ipcMain.handle('checkBinary', async (_e, name) => {
   const common = ['/usr/bin','/usr/local/bin','/home/brgjr10/.local/bin','/opt']
   for (const dir of common) {
     for (const c of candidates) {
-      try { require('node:fs').accessSync(require('node:path').join(dir,c)); return true } catch {}
+      try { fs.accessSync(require('node:path').join(dir,c)); return true } catch {}
     }
   }
   return false

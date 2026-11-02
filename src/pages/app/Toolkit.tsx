@@ -34,15 +34,8 @@ export default function Toolkit() {
   const total = tools.length
 
   const handleConnect = async (name: string) => {
-    const apiSources = ['Shodan','VirusTotal','HaveIBeenPwned']
-    if (apiSources.includes(name)) {
-      const key = window.prompt(`Enter API key for ${name}`)
-      if (key) await (window as any).api?.setApiKey?.(name, key)
-    } else {
-      const r = await (window as any).api?.connectSource?.(name)
-      alert(r?.msg || 'done')
-    }
-    // refresh
+    const val = window.prompt(`Connection string for ${name} (API key, binary path, or token)`)
+    if (val) await (window as any).api?.setApiKey?.(name, val)
     const bin = name.toLowerCase().replace(/[^a-z0-9]/g,'')
     const ok = await (window as any).api?.checkBinary?.(bin)
     setStatuses((prev) => ({ ...prev, [name]: ok ? 'connected' : (prev[name] || 'available') }))
