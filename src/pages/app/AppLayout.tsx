@@ -8,6 +8,7 @@ import {
   MagnifyingGlass as Search,
   Wrench,
   Folder,
+  Question,
   X,
 } from '@phosphor-icons/react'
 import { Logo } from '../../components/Logo'
@@ -27,6 +28,7 @@ const nav: NavItem[] = [
 const advanced: NavItem[] = [
   { to: '/app/toolkit', label: 'Sources', icon: Wrench },
   { to: '/app/cases', label: 'Cases', icon: Folder },
+  { to: '/app/help', label: 'Help', icon: Question },
 ]
 
 // The toolbar shows a title only where the page itself doesn't lead with one.
