@@ -116,6 +116,9 @@ export default function Results() {
             <button className="flex h-10 items-center gap-2 rounded-full bg-white px-4 text-[15px] font-medium text-black transition-colors hover:bg-white/85">
               <Download className="size-4" /> Save as PDF
             </button>
+            <button onClick={() => navigator.clipboard?.writeText(profiles.map(p=>p.site+' '+p.url).join('\n'))} className="flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-[15px] font-medium text-paper transition-colors hover:bg-white/5">
+              Copy
+            </button>
             <button onClick={() => {
               const blob = new Blob([JSON.stringify(profiles, null, 2)], { type: 'application/json' })
               const u = URL.createObjectURL(blob)
