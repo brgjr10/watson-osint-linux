@@ -1,5 +1,5 @@
 const { app, BrowserWindow, Menu, shell, ipcMain } = require('electron')
-const { spawn } = require('node:child_process')
+const { spawn, execFileSync } = require('node:child_process')
 const path = require('node:path')
 const fs = require('node:fs')
 
@@ -79,6 +79,20 @@ function categorizeSite(site) {
   if (/youtube|soundcloud|medium|pinterest|imgur/.test(s)) return 'Media'
   return 'Social'
 }
+
+ipcMain.handle('checkBinary', async (_e, name) => {
+  const candidates = [name, name.toLowerCase()]
+  for (const c of candidates) {
+    try { execFileSync('which', [c], { stdio: 'ignore' }); return true } catch {}
+  }
+  const common = ['/usr/bin','/usr/local/bin','/home/brgjr10/.local/bin','/opt']
+  for (const dir of common) {
+    for (const c of candidates) {
+      try { require('node:fs').accessSync(require('node:path').join(dir,c)); return true } catch {}
+    }
+  }
+  return false
+})
 
 ipcMain.handle('lookup', async (_e, kind, query) => {
   const results = []

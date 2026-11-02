@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus } from '@phosphor-icons/react'
 import { tools } from '../../data/mock'
 
@@ -7,8 +7,23 @@ const categories = ['All', 'Infrastructure', 'Identity', 'Corporate', 'Web & arc
 export default function Toolkit() {
   const [cat, setCat] = useState('All')
   const [q, setQ] = useState('')
+  const [statuses, setStatuses] = useState<Record<string,string>>({})
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const next: Record<string,string> = {}
+      for (const t of tools as any[]) {
+        const bin = t.name.toLowerCase().replace(/[^a-z0-9]/g,'')
+        let connected = false
+        try { connected = await (window as any).api?.checkBinary?.(bin) } catch {}
+        next[t.name] = connected ? 'connected' : (t.status === 'beta' ? 'beta' : 'available')
+      }
+      if (!cancelled) setStatuses(next)
+    })()
+    return () => { cancelled = true }
+  }, [])
   const list = tools.filter((t: any) => (cat === 'All' || t.category === cat) && t.name.toLowerCase().includes(q.toLowerCase()))
-  const connected = tools.filter((t: any) => t.status === 'connected').length
+  const connected = tools.filter((t: any) => (statuses[t.name] || t.status) === 'connected').length
   const total = tools.length
 
   return (
@@ -47,8 +62,8 @@ export default function Toolkit() {
             <div key={t.name} className="rounded-lg border border-white/[0.08] bg-ink-900/60 p-4">
               <div className="flex items-center justify-between">
                 <div className="text-[15px] font-medium">{t.name}</div>
-                <span className={`rounded-full px-2 py-0.5 text-[11px] ${t.status === 'connected' ? 'bg-emerald-400/10 text-emerald-300' : t.status === 'beta' ? 'bg-amber-400/10 text-amber-300' : 'bg-white/10 text-fog'}`}>
-                  {t.status}
+                <span className={`rounded-full px-2 py-0.5 text-[11px] ${(statuses[t.name] || t.status) === 'connected' ? 'bg-emerald-400/10 text-emerald-300' : (statuses[t.name] || t.status) === 'beta' ? 'bg-amber-400/10 text-amber-300' : 'bg-white/10 text-fog'}`}>
+                  {statuses[t.name] || t.status}
                 </span>
               </div>
               <div className="mt-1 text-[13px] text-fog">{t.description}</div>
