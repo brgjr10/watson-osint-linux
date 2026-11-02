@@ -118,6 +118,7 @@ export default function Results() {
             {same} of them look like the same person. {profiles.length - same} are name matches only.
           </p>
           {(() => {
+            const avatar = profiles.map((p:any)=>p.avatar).find(Boolean)
             const names = Array.from(new Set(profiles.map((p:any)=>p.name).filter(Boolean)))
             const bios = profiles.map((p:any)=>p.bio).filter(Boolean).slice(0,1)
             const locs = Array.from(new Set(profiles.map((p:any)=>p.location).filter(Boolean)))
@@ -125,6 +126,7 @@ export default function Results() {
             if (!names.length && !bios.length && !locs.length && !links.length) return null
             return (
               <div className="mt-4 space-y-1 text-[13px] text-fog">
+                {avatar && <img src={avatar} alt="" className="mb-2 size-12 rounded-full" />}
                 {names.length>0 && <div><b className="text-paper">Name:</b> {names.join(', ')}</div>}
                 {bios.length>0 && <div><b className="text-paper">Bio:</b> {bios[0]}</div>}
                 {locs.length>0 && <div><b className="text-paper">Location:</b> {locs.join(', ')}</div>}
