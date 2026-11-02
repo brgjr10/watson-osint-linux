@@ -1,6 +1,6 @@
 # Watson
 
-<img width="1280" height="520" alt="image" src="https://github.com/user-attachments/assets/d6633757-603a-478a-a1fb-f1dac7e73b2a" />
+<img width="1280" height="640" alt="image" src="https://github.com/user-attachments/assets/58e48262-e10c-45ba-8a91-2a9624575e91" />
 
 Free OSINT tool for Linux — people search across public sites by nickname, email, phone, or website.
 
