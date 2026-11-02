@@ -333,6 +333,28 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
       } catch {}
     }
   } catch (e) {}
+
+  // Enrich each result with profile metadata fetched from its URL
+  const enrichOne = async (r) => {
+    if (!r.url) return r
+    try {
+      const { out } = await runCmd('curl', ['-s','-L','-m','12','-A','Mozilla/5.0', r.url], 15000)
+      const title = (out.match(/<title[^>]*>([^<]{1,120})<\/title>/i)||[])[1]
+      const ogTitle = (out.match(/property=["']og:title["'][^>]*content=["']([^"']{1,120})/i)||[])[1]
+      const ogDesc = (out.match(/property=["']og:description["'][^>]*content=["']([^"']{1,240})/i)||[])[1]
+      const metaDesc = (out.match(/name=["']description["'][^>]*content=["']([^"']{1,240})/i)||[])[1]
+      const name = (ogTitle || title || '').trim()
+      const bio = (ogDesc || metaDesc || '').trim()
+      const links = (out.match(/https?:\/\/[^"\s<>]+/g)||[]).filter(u=>/github|twitter|linkedin|instagram|youtube|medium/i.test(u)).slice(0,5)
+      if (name && !r.name) r.name = name
+      if (bio && !r.bio) r.bio = bio
+      if (links.length && !r.links) r.links = Array.from(new Set(links))
+    } catch {}
+    return r
+  }
+  const toEnrich = results.filter(r=>r.url).slice(0,8)
+  await Promise.all(toEnrich.map(enrichOne))
+
   try { require('node:fs').appendFileSync('/tmp/lookup.log', JSON.stringify({count: results.length, query, kind}) + '\n'); } catch (e) {}
   return results
 })
