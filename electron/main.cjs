@@ -80,9 +80,9 @@ function categorizeSite(site) {
   return 'Social'
 }
 
-const NO_SETUP = new Set(['WaybackMachine','crt.sh','Wayback Machine'])
+const NO_SETUP = new Set(['waybackmachine','crtsh','wayback machine','WaybackMachine','crt.sh','Wayback Machine'])
 ipcMain.handle('checkBinary', async (_e, name) => {
-  if (NO_SETUP.has(name)) return true
+  if (NO_SETUP.has(name) || NO_SETUP.has(String(name).toLowerCase().replace(/[^a-z0-9]/g,''))) return true
   const fs = require('node:fs')
   try {
     const data = JSON.parse(fs.readFileSync('/home/brgjr10/.config/watson/keys.json','utf8'))
