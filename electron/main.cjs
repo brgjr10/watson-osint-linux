@@ -203,16 +203,21 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
             if (site) addResult(site, categorizeSite(site), 'email registered', 'likely', { emails: [query], connections: connections.slice(0,20) })
           }
         }
-      // HIBP breach check (public, no key for count)
+      // HIBP breach check (requires API key)
       try {
-        const { out } = await runCmd('curl', ['-s', '-m', '20', '-H', 'hibp-api-key: 00000000000000000000000000000000', `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(query)}?truncateResponse=false`], 30000)
-        if (out && out.trim().startsWith('[')) {
-          try {
-            const arr = JSON.parse(out)
-            for (const b of (Array.isArray(arr)?arr:[]).slice(0,20)) {
-              addResult(b.Name || 'Breach', 'Threat intel', `breached: ${b.Title || b.Name}`, 'likely', { since: b.BreachDate ? String(b.BreachDate).slice(0,4) : '', url: `https://haveibeenpwned.com` })
-            }
-          } catch {}
+        const fs=require('node:fs')
+        let hbKey=''
+        try { hbKey = JSON.parse(fs.readFileSync('/home/brgjr10/.config/watson/keys.json','utf8'))?.HIBP || '' } catch {}
+        if (hbKey) {
+          const { out } = await runCmd('curl', ['-s', '-m', '20', '-H', `hibp-api-key: ${hbKey}`, `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent(query)}?truncateResponse=false`], 30000)
+          if (out && out.trim().startsWith('[')) {
+            try {
+              const arr = JSON.parse(out)
+              for (const b of (Array.isArray(arr)?arr:[]).slice(0,20)) {
+                addResult(b.Name || 'Breach', 'Threat intel', `breached: ${b.Title || b.Name}`, 'likely', { since: b.BreachDate ? String(b.BreachDate).slice(0,4) : '', url: `https://haveibeenpwned.com` })
+              }
+            } catch {}
+          }
         }
       } catch {}
         const ex = extractAll(out)
