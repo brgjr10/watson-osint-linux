@@ -99,7 +99,7 @@ const INSTALL_CMDS = {
   'Maigret': ['pip', ['install', '--user', 'maigret']],
   'Holehe': ['pip', ['install', '--user', 'holehe']],
   'Sherlock': ['pip', ['install', '--user', 'sherlock-project']],
-  'WhatsMyName': ['git', ['clone', 'https://github.com/WebBreacher/WhatsMyName.git', '/home/brgjr10/.local/share/watson/WhatsMyName']],
+  'WhatsMyName': ['bash', ['-c', 'mkdir -p /home/brgjr10/.local/share/watson && (cd /home/brgjr10/.local/share/watson/WhatsMyName && git pull) || git clone https://github.com/WebBreacher/WhatsMyName.git /home/brgjr10/.local/share/watson/WhatsMyName']],
   'Subfinder': ['go', ['install', 'github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest']],
   'Amass': ['go', ['install', 'github.com/owasp-amass/amass/v4/...@master']],
 }
