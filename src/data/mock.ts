@@ -23,7 +23,7 @@ export const caseGraph: { nodes: any[]; edges: any[] } = {
   edges: [],
 }
 
-export type ToolCategory = 'Infrastructure' | 'Identity' | 'Corporate' | 'Web & archive' | 'Threat intel' | 'Code'
+export type ToolCategory = 'Infrastructure' | 'Identity' | 'Corporate' | 'Web & archive' | 'Threat intel' | 'Code' | 'Social' | 'Media'
 
 export interface Tool {
   name: string
@@ -49,6 +49,15 @@ export const tools: Tool[] = [
   { name: 'Wayback Machine', category: 'Web & archive', description: 'Internet archive search', license: 'Free', status: 'available', runs: 0 },
   { name: 'crt.sh', category: 'Infrastructure', description: 'Certificate transparency logs', license: 'Free', status: 'available', runs: 0 },
   { name: 'Hunter.io', category: 'Corporate', description: 'Email finder and verifier', license: 'Freemium', status: 'available', runs: 0 },
+  { name: 'Google Dorks', category: 'Web & archive', description: 'Advanced search operators', license: 'Free', status: 'connected', runs: 0 },
+  { name: 'Bing', category: 'Web & archive', description: 'Web search', license: 'Free', status: 'connected', runs: 0 },
+  { name: 'DuckDuckGo', category: 'Web & archive', description: 'Privacy-focused search', license: 'Free', status: 'connected', runs: 0 },
+  { name: 'LinkedIn', category: 'Corporate', description: 'Professional network', license: 'Free', status: 'available', runs: 0 },
+  { name: 'Twitter/X', category: 'Social', description: 'Social media search', license: 'Free', status: 'available', runs: 0 },
+  { name: 'Instagram', category: 'Social', description: 'Photo/video platform', license: 'Free', status: 'available', runs: 0 },
+  { name: 'Facebook', category: 'Social', description: 'Social network', license: 'Free', status: 'available', runs: 0 },
+  { name: 'TikTok', category: 'Social', description: 'Short video platform', license: 'Free', status: 'available', runs: 0 },
+  { name: 'YouTube', category: 'Media', description: 'Video platform', license: 'Free', status: 'available', runs: 0 },
 ]
 
 export interface CaseRow {
