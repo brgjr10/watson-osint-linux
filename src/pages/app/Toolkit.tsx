@@ -87,7 +87,7 @@ export default function Toolkit() {
               </div>
               <div className="mt-1 text-[13px] text-fog">{t.description}</div>
               <div className="mt-3 text-[12px] text-fog-dim">{t.category} · {t.license}</div>
-              <button onClick={() => handleConnect(t.name)} className="mt-3 rounded-md border border-white/10 px-2 py-1 text-[12px] text-paper-dim hover:text-paper">Connect</button>
+              <button onClick={() => handleConnect(t.name)} className="mt-3 rounded-md border border-white/10 px-2 py-1 text-[12px] text-paper-dim hover:text-paper">{(statuses[t.name] || t.status) === 'connected' ? 'Configure' : 'Connect'}</button>
             </div>
           ))}
         </div>
