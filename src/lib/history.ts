@@ -27,6 +27,7 @@ function save(items: HistoryItem[]) {
   } catch {}
 }
 
+export function clearHistory() { try { localStorage.removeItem(KEY) } catch {} }
 export function addHistory(q: string) {
   const query = q.trim()
   if (!query) return

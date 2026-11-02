@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { CaretRight as ChevronRight } from '@phosphor-icons/react'
 import { detectKind } from '../../data/mock'
 import { kindMeta } from './Search'
-import { getHistory } from '../../lib/history'
+import { getHistory, clearHistory } from '../../lib/history'
 import { useEffect, useState } from 'react'
 import { foundProfiles } from '../../data/mock'
 
@@ -17,6 +17,7 @@ export default function History() {
     <div className="mx-auto max-w-[760px] px-5 pb-16 pt-8">
       <h1 className="text-[34px] font-semibold leading-[1.1] tracking-[-0.02em]">History</h1>
       <p className="mt-1 text-[15px] text-fog">Everything you’ve looked up. Saved only on this computer.</p>
+      <button onClick={() => { clearHistory(); setHistory([]) }} className="mt-3 rounded-lg border border-white/10 px-3 py-1.5 text-[13px] text-paper-dim hover:text-paper">Clear history</button>
 
       {history.length === 0 ? (
         <div className="mt-16 text-center text-fog">
