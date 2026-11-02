@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Plus } from '@phosphor-icons/react'
-import { tools } from '../../data/mock'
 
 const categories = ['All', 'Infrastructure', 'Identity', 'Corporate', 'Web & archive', 'Threat intel', 'Code']
+
+const tools: any[] = []
 
 export default function Toolkit() {
   const [cat, setCat] = useState('All')

@@ -180,13 +180,10 @@ function QuickFind({ onClose }: { onClose: () => void }) {
     return () => trigger?.focus()
   }, [])
 
-  const groups = [
+  const groups: { h: string; items: { label: string; to: string }[] }[] = [
     {
       h: 'Recent searches',
-      items: ['johndoe_92', 'acme-logistics.com', 'Northwind Holdings Ltd'].map((q) => ({
-        label: q,
-        to: `/app/results?q=${encodeURIComponent(q)}`,
-      })),
+      items: [],
     },
   ]
 

@@ -113,8 +113,13 @@ export default function Results() {
             <Sparkles className="size-4" /> What Watson found
           </h2>
           <p className="mt-2.5 text-[17px] leading-[1.5] text-paper">
-            This {meta.label.toLowerCase()} is used on <b className="font-semibold">{profiles.length} public sites</b>.{' '}
-            {same} of them look like the same person. {profiles.length - same} are name matches only.
+            This {meta.label.toLowerCase()} is used on <b className="font-semibold">{profiles.length} public sites</b>.
+            {' '}
+            {same === profiles.length
+              ? 'All of them look like the same person.'
+              : same === 0
+                ? 'None are confirmed to be the same person.'
+                : `${same} look like the same person, ${profiles.length - same} are name matches only.`}
           </p>
           {(() => {
             const avatar = profiles.map((p:any)=>p.avatar).find(Boolean)
@@ -129,14 +134,36 @@ export default function Results() {
                 {names.length>0 && <div><b className="text-paper">Name:</b> {names.join(', ')}</div>}
                 {bios.length>0 && <div><b className="text-paper">Bio:</b> {bios[0]}</div>}
                 {locs.length>0 && <div><b className="text-paper">Location:</b> {locs.join(', ')}</div>}
-                {links.length>0 && <div><b className="text-paper">Links:</b> {links.slice(0,5).join(' · ')}</div>}
+                {links.length>0 && (
+                  <div>
+                    <b className="text-paper">Links:</b>
+                    <div className="mt-1 flex flex-col gap-0.5">
+                      {links.slice(0,5).map((l) => (
+                        <a key={l} href={l} target="_blank" rel="noreferrer" className="break-all text-gas-400 hover:underline">{l}</a>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {(() => {
                   const emails = Array.from(new Set(profiles.flatMap((p:any)=>p.emails||[])))
                   const phones = Array.from(new Set(profiles.flatMap((p:any)=>p.phones||[])))
-                  return (<>
-                    {emails.length>0 && <div><b className="text-paper">Emails:</b> {emails.join(', ')}</div>}
-                    {phones.length>0 && <div><b className="text-paper">Phones:</b> {phones.join(', ')}</div>}
-                  </>)
+                  if (!emails.length && !phones.length) return null
+                  return (
+                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                      {emails.length>0 && (
+                        <div className="rounded-lg border border-white/[0.06] p-2.5">
+                          <div className="text-[11px] uppercase tracking-wide text-fog mb-1">Emails</div>
+                          <div className="text-[13px] break-all">{emails.join(', ')}</div>
+                        </div>
+                      )}
+                      {phones.length>0 && (
+                        <div className="rounded-lg border border-white/[0.06] p-2.5">
+                          <div className="text-[11px] uppercase tracking-wide text-fog mb-1">Phones</div>
+                          <div className="text-[13px] break-all">{phones.join(', ')}</div>
+                        </div>
+                      )}
+                    </div>
+                  )
                 })()}
               </div>
             )
@@ -253,11 +280,11 @@ export default function Results() {
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block break-words text-[15px] font-medium">{p.site}</span>
-                  <span className="block break-words text-[13px] text-fog">
-                    {p.detail}, since {p.since}
+<span className="block break-words text-[13px] text-fog">
+                    {p.detail}{p.since ? `, since ${p.since}` : ''}
                   </span>
                 </span>
-                <span className={`shrink-0 text-[13px] ${p.match === 'exact' ? 'text-evidence' : 'text-fog'}`}>
+                <span className={`shrink-0 text-[13px] ${p.match === 'exact' ? 'text-paper' : 'text-paper-dim'}`}>
                   {p.match === 'exact' ? 'Same person' : 'Name match'}
                 </span>
                 <ChevronRight className="size-4 shrink-0 text-fog transition-colors group-hover:text-paper" />
@@ -290,7 +317,7 @@ export default function Results() {
               <div>
                 <div className="text-[13px] font-medium text-fog mb-1">Details</div>
                 <div className="text-[14px]">{selected.detail}</div>
-                <div className="mt-1 text-[13px] text-fog">Since {selected.since}</div>
+                <div className="mt-1 text-[13px] text-fog">{selected.since ? `Since ${selected.since}` : ''}</div>
               </div>
               {selected.username && (
                 <div>

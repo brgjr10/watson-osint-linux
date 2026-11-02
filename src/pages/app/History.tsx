@@ -4,7 +4,6 @@ import { detectKind } from '../../data/mock'
 import { kindMeta } from './Search'
 import { getHistory, clearHistory } from '../../lib/history'
 import { useEffect, useState } from 'react'
-import { foundProfiles } from '../../data/mock'
 
 export default function History() {
   const [history, setHistory] = useState<any[]>([])
@@ -29,7 +28,7 @@ export default function History() {
           <ul className="mt-2 overflow-hidden rounded-2xl border border-transparent bg-ink-850 ring-1 ring-white/[0.06]">
             {g.items.map((it: any, i: number) => {
               const m = kindMeta[detectKind(it.q)]
-              const found = it.q.trim().toLowerCase() === 'johndoe_92' ? foundProfiles.length : 0
+              const found = 0
               return (
                 <li key={it.q}>
                   <Link

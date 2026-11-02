@@ -26,19 +26,6 @@ const statusStyle: Record<CaseRow['status'], string> = {
   closed: 'bg-white/[0.08] text-fog',
 }
 
-const details: Record<string, { rows: [string, string][]; sources: string[]; note: string }> = {
-  sub1: {
-    rows: [['First seen', '2021-03-14'], ['Resolves to', '185.193.88.20'], ['Service', 'Fortinet SSL-VPN'], ['TLS issuer', "Let's Encrypt R11"]],
-    sources: ['crt.sh', 'OWASP Amass', 'Subfinder'],
-    note: 'Internet-facing VPN portal. Combined with an exposed shared mailbox, this is the most likely way in.',
-  },
-  mail: {
-    rows: [['Type', 'Shared mailbox'], ['Data breaches', '1 (2024)'], ['Registered on', '4 public services'], ['Mail provider', 'Microsoft 365']],
-    sources: ['theHarvester', 'Have I Been Pwned', 'holehe'],
-    note: 'Shared IT mailbox found in a 2024 data breach. Reset its password and check two-factor sign-in.',
-  },
-}
-
 const riskNote = {
   high: 'Needs attention. Open the evidence below to see why.',
   medium: 'Worth a look, but not urgent.',
@@ -73,14 +60,6 @@ export default function CaseView() {
       </div>
     )
   }
-  const d = details[selected] ?? {
-    rows: [
-      ['Type', node.kind],
-      ['Linked items', String(caseGraph.edges.filter((e: any) => e.from === selected || e.to === selected).length)],
-    ],
-    sources: ['WHOIS / RDAP'],
-    note: node.risk ? (riskNote as any)[node.risk] : 'Nothing unusual found yet.',
-  }
   const NodeIcon = (kindIcon as any)[node.kind]
 
   return (
@@ -105,38 +84,26 @@ export default function CaseView() {
         <div className="flex flex-col border-white/[0.06] xl:min-h-0 xl:border-r">
           <div className="scrollbar-thin flex-1 space-y-5 overflow-y-auto overscroll-contain p-4">
             <div className="ml-6 rounded-xl rounded-tr-sm bg-white/[0.06] px-3.5 py-2.5 text-[13px] text-paper">
-              Map the external attack surface of acme-logistics.com before we onboard them as a vendor.
+              {c.purpose || 'No case purpose set.'}
             </div>
 
             <div>
               <div className="flex items-center gap-2 text-xs text-fog">
                 <LogoMark size={16} /> Watson
-                <span>checked {agentSteps.length} sources in 18 seconds</span>
+                <span>{agentSteps.length} sources checked</span>
               </div>
               <div className="mt-3 space-y-2">
                 {agentSteps.map((s) => (
                   <div key={s.tool} className="flex items-center gap-2 rounded-lg border border-white/5 bg-ink-900/60 px-2.5 py-1.5">
                     <Check className="size-3 text-evidence" />
                     <span className="text-[13px] text-paper/85">{s.tool}</span>
-                    <span className="ml-auto text-[11px] tabular-nums text-fog">{(s.ms / 1000).toFixed(1)}s</span>
                   </div>
                 ))}
               </div>
 
               <div className="mt-4 space-y-3 text-[13px] leading-relaxed text-paper-dim">
                 <p>
-                  <span className="text-paper">Summary.</span> ACME Logistics GmbH runs 23 public websites and servers. Two
-                  need attention before onboarding:
-                </p>
-                <p>
-                  <span className="font-medium text-risk">High risk:</span> <span className="font-mono text-paper">vpn.acme-logistics.com</span>{' '}
-                  exposes a VPN login page<Cite n={1} />, and the shared mailbox{' '}
-                  <span className="font-mono text-paper">it-ops@</span> appears in a 2024 data breach<Cite n={2} />.
-                </p>
-                <p>
-                  <span className="font-medium text-caution">Medium risk:</span> a test server is publicly reachable and is
-                  mentioned in two public config files<Cite n={3} />
-                  <Cite n={4} />.
+                  <span className="text-paper">Summary.</span> {c.title ? `Analysis for ${c.title}.` : 'No analysis has run yet.'}
                 </p>
               </div>
               <div className="mt-3 flex gap-1">
@@ -155,7 +122,7 @@ export default function CaseView() {
 
             <div className="space-y-1.5">
               <h2 className="text-[13px] font-semibold text-fog">Try next</h2>
-              {['Check lookalike domains of acme-logistics', 'Find employees with public profiles', 'Compare with last month’s check'].map((s) => (
+              {['Check lookalike domains', 'Find employees with public profiles', 'Compare with last month’s check'].map((s) => (
                 <button
                   key={s}
                   className="flex w-full items-center gap-2 rounded-lg border border-white/[0.08] px-3 py-2 text-left text-xs text-paper-dim transition-colors hover:border-gas-400/40 hover:text-paper"
@@ -206,7 +173,7 @@ export default function CaseView() {
             <span className="flex items-center gap-1.5">
               <RiskMark risk="medium" /> Medium risk
             </span>
-            <span>9 of 214 shown</span>
+            <span>{caseGraph.nodes.length} of {caseGraph.nodes.length} shown</span>
           </div>
         </div>
 
@@ -238,25 +205,29 @@ export default function CaseView() {
             </div>
           )}
 
-          {d.note && <p className="mt-5 text-[13px] leading-relaxed text-paper-dim">{d.note}</p>}
+          {node.risk && node.risk !== 'low' && (
+            <p className="mt-5 text-[13px] leading-relaxed text-paper-dim">{riskNote[node.risk as keyof typeof riskNote]}</p>
+          )}
 
           <dl className="mt-5 divide-y divide-white/[0.06] rounded-xl border border-transparent bg-ink-850 ring-1 ring-white/[0.06]">
-            {d.rows.map(([k, v]) => (
-              <div key={k} className="flex justify-between gap-3 px-3.5 py-2.5 text-xs">
-                <dt className="text-fog">{k}</dt>
-                <dd className="text-right text-paper/90">{v}</dd>
-              </div>
-            ))}
+            <div className="flex justify-between gap-3 px-3.5 py-2.5 text-xs">
+              <dt className="text-fog">Type</dt>
+              <dd className="text-right text-paper/90 capitalize">{node.kind}</dd>
+            </div>
+            <div className="flex justify-between gap-3 px-3.5 py-2.5 text-xs">
+              <dt className="text-fog">Linked items</dt>
+              <dd className="text-right text-paper/90">
+                {caseGraph.edges.filter((e: any) => e.from === selected || e.to === selected).length}
+              </dd>
+            </div>
           </dl>
 
           <h2 className="mt-5 text-[13px] font-semibold text-fog">Evidence</h2>
           <ol className="mt-2 space-y-1.5">
-            {d.sources.map((s, i) => (
-              <li key={s} className="flex items-center gap-2 rounded-lg bg-white/[0.03] px-3 py-2 text-xs">
-                <span className="tabular-nums text-gas-400">[{i + 1}]</span>
-                <span className="text-paper-dim">{s}</span>
-              </li>
-            ))}
+            <li className="flex items-center gap-2 rounded-lg bg-white/[0.03] px-3 py-2 text-xs">
+              <span className="tabular-nums text-gas-400">[1]</span>
+              <span className="text-paper-dim">WHOIS / RDAP</span>
+            </li>
           </ol>
 
           <div className="mt-6 grid grid-cols-2 gap-2">
@@ -266,13 +237,5 @@ export default function CaseView() {
         </div>
       </div>
     </div>
-  )
-}
-
-function Cite({ n }: { n: number }) {
-  return (
-    <sup className="ml-0.5 rounded bg-gas-400/10 px-1 text-[11px] tabular-nums text-gas-300" aria-label={`source ${n}`}>
-      {n}
-    </sup>
   )
 }

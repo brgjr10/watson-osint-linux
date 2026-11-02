@@ -21,7 +21,7 @@ import screenSearch from '../../docs/images/screen-search.png'
 import screenScanning from '../../docs/images/screen-scanning.png'
 import screenResults from '../../docs/images/step-4-results.png'
 
-const sites = ['GitHub', 'Reddit', 'Steam', 'Twitch', 'Medium', 'Telegram', 'Pinterest', 'Stack Overflow', 'Chess.com', 'SoundCloud', 'Habr', 'Docker Hub']
+const sites: string[] = []
 
 // Served by the watsonfind.icu host at /api/download (see the nginx site config).
 export const DOWNLOAD_URL = '/api/download'
@@ -145,6 +145,7 @@ function Hero() {
 }
 
 function Sites() {
+  if (sites.length === 0) return null
   return (
     <section aria-labelledby="sites-title" className="px-5 py-20">
       <h2 id="sites-title" className="text-center text-[15px] text-fog">
