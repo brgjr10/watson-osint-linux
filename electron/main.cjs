@@ -293,6 +293,12 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
         }
       } catch {}
     } else if (kind === 'phone') {
+      // normalize and report country code
+      try {
+        const digits = query.replace(/\D/g,'')
+        const cc = digits.startsWith('1') ? 'US/CA' : digits.startsWith('44') ? 'UK' : digits.startsWith('91') ? 'IN' : digits.startsWith('49') ? 'DE' : digits.startsWith('33') ? 'FR' : 'unknown'
+        if (digits.length >= 10) addResult('Phone normalized', 'Identity', `country: ${cc}, digits: ${digits.length}`, 'exact', {})
+      } catch {}
       // best-effort public lookup via phoneinfoga if installed
       try {
         const { out } = await runCmd('which', ['phoneinfoga'], 5000)
