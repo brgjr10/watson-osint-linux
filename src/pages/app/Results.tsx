@@ -101,6 +101,7 @@ export default function Results() {
           <h2 className="text-[17px] font-semibold">Nothing found on public sites</h2>
           <p className="mt-1.5 text-[15px] leading-relaxed text-fog">
             Check the spelling, or try a different nickname, email, phone number or website.
+            For phone lookups, connect a provider in Sources.
           </p>
         </section>
       ) : (
