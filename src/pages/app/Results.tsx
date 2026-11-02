@@ -110,8 +110,7 @@ export default function Results() {
           </h2>
           <p className="mt-2.5 text-[17px] leading-[1.5] text-paper">
             This {meta.label.toLowerCase()} is used on <b className="font-semibold">{profiles.length} public sites</b>.{' '}
-            {same} of them look like the same person: same name, matching photos and links between profiles. The oldest
-            account is from 2015, and they are most active on GitHub and Reddit.
+            {same} of them look like the same person. {profiles.length - same} are name matches only.
           </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
             <button className="flex h-10 items-center gap-2 rounded-full bg-white px-4 text-[15px] font-medium text-black transition-colors hover:bg-white/85">
