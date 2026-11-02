@@ -33,6 +33,10 @@ Free OSINT tool for Linux — people search across public sites by nickname, ema
 
 ### AppImage (Recommended)
 
+<img width="749" height="290" alt="image" src="https://github.com/user-attachments/assets/40bf5da3-69de-423c-b494-b7685078c5ca" />
+
+[AppImage Scan](https://www.virustotal.com/gui/file/7fbc84740e54d7e183b1f42faae7702b919c2b36fa405438276f2f2fe29b592c/detection)
+
 Download the latest AppImage from [Releases](https://github.com/brgjr10/watson-osint-linux/releases).
 
 ```bash
