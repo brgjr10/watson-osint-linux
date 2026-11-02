@@ -102,6 +102,7 @@ export default function AppLayout() {
 
         <div className="mt-auto space-y-1 p-2.5">
           <p className="px-2.5 pb-1 text-[12px] leading-snug text-fog">Free forever. No account needed.</p>
+          <p className="px-2.5 text-[11px] text-fog/60">v4.1.0</p>
         </div>
       </aside>
       {open && <div className="fixed inset-0 z-30 bg-black/60 lg:hidden" onClick={() => setOpen(false)} />}
