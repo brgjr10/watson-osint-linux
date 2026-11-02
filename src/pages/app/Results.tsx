@@ -9,7 +9,6 @@ import { addHistory } from '../../lib/history'
 
 const stages = ['Checking social networks', 'Checking forums', 'Checking developer sites', 'Checking games and media', 'Putting it together']
 const groups: ('All' | PlatformGroup)[] = ['All', 'Social', 'Dev', 'Gaming', 'Forums', 'Media']
-const SITES = 7793
 
 export default function Results() {
   const [params] = useSearchParams()
@@ -92,7 +91,7 @@ export default function Results() {
         <div className="mt-8">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 text-[15px]">
             <span>Searching…</span>
-            <span className="tabular-nums text-fog">{Math.round((progress / 100) * SITES).toLocaleString('en-US')} of {SITES.toLocaleString('en-US')} sites</span>
+            <span className="tabular-nums text-fog">Searching…</span>
           </div>
           <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/[0.08]">
             <div className="h-full rounded-full bg-gas-400 transition-[width] duration-50" style={{ width: `${progress}%` }} />
