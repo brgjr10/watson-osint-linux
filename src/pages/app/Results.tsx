@@ -21,6 +21,7 @@ export default function Results() {
   const [profiles, setProfiles] = useState<FoundProfile[]>([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<FoundProfile | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (q) {
@@ -43,9 +44,10 @@ export default function Results() {
         setProfiles(Array.isArray(res) ? res : [])
         setLoading(false)
       }, 150)
-    }).catch(() => {
+    }).catch((e:any) => {
       clearInterval(t)
       setProgress(100)
+      setError(String(e?.message||e||'lookup failed'))
       setTimeout(() => {
         setProfiles([])
         setLoading(false)
@@ -102,6 +104,7 @@ export default function Results() {
           <p className="mt-1.5 text-[15px] leading-relaxed text-fog">
             Check the spelling, or try a different nickname, email, phone number or website.
             For phone lookups, connect a provider in Sources.
+            {error && <span className="block mt-2 text-risk">Error: {error}</span>}
           </p>
           <button onClick={() => window.location.reload()} className="mt-4 rounded-lg border border-white/10 px-3 py-1.5 text-[13px] text-paper-dim hover:text-paper">Retry</button>
         </section>
