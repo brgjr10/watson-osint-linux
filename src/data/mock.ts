@@ -127,7 +127,7 @@ export async function searchProfiles(query: string): Promise<FoundProfile[]> {
     const w = typeof window !== 'undefined' ? (window as any) : (globalThis as any).window
     const api = w?.api || (globalThis as any).api
     if (api && typeof api.runLookup === 'function') {
-      const lookupKind = kind === 'email' ? 'email' : 'username'
+      const lookupKind = (kind === 'email' || kind === 'phone' || kind === 'domain' || kind === 'company') ? kind : 'username'
       const res: any = await api.runLookup(lookupKind, q)
       if (Array.isArray(res)) {
         return res

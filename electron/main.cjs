@@ -135,72 +135,113 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
   const results = []
   const seen = new Set()
   const connections = []
+  const addResult = (site, group, detail, match='exact', extra={}) => {
+    const k = site.toLowerCase()
+    if (seen.has(k)) return
+    seen.add(k)
+    results.push({ site, group, since: extra.since || '', hue: '#58a6ff', detail, match, username: query, ...extra })
+  }
   try {
     if (kind === 'username') {
-      const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '100', '--dns-resolver', 'threaded', '-n', '3', '--timeout', '20'], 180000)
-      const { out: out2 } = await runCmd('/home/brgjr10/.local/bin/sherlock', [query, '--timeout', '15', '--no-color'], 90000)
-      const combined = out + '\n' + out2
-      const extracted = extractAll(combined)
-      for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'combined'})
-      for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'combined'})
-      const nameMatches = combined.match(/fullname:\s*(.+)/gi) || []
-      for (const nm of nameMatches) {
-        const v = nm.replace(/fullname:\s*/i,'').trim()
-        if (v && v.length > 2 && v.length < 60 && !/[0-9]/.test(v) && !v.includes('http') && !/avatar|image|count|id|uid/i.test(v)) connections.push({type: 'name', value: v, source: 'maigret'})
-      }
-      for (const url of extracted.urls) {
-        try {
-          if (/patreon\.com\/soxoj|googleapis|gstatic|akamai|cloudfront|fbcdn|tiktokcdn|twimg|githubusercontent/.test(url)) continue
-          const u = new URL(url)
-          let site = u.hostname.replace(/^www\./,'')
-          if (/soundcloud/.test(site)) site = 'SoundCloud'
-          else if (/github\.com/.test(site)) site = 'GitHub'
-          else if (/gitlab/.test(site)) site = 'GitLab'
-          else if (/reddit\.com/.test(site)) site = 'Reddit'
-          else if (/facebook\.com|^fb\.com$/.test(site)) site = 'Facebook'
-          else if (/tiktok\.com/.test(site)) site = 'TikTok'
-          else if (/gravatar/.test(site)) site = 'Gravatar'
-          else if (/imgur\.com/.test(site)) site = 'Imgur'
-          else if (/snapchat/.test(site)) site = 'Snapchat'
-          else if (/steamcommunity\.com/.test(site)) site = 'Steam'
-          else if (/gist\.github\.com/.test(site)) site = 'GitHubGist'
-          else if (/sndcdn/.test(site)) continue
-          else if (/rapidproxy/.test(site)) continue
-          else {
+      try {
+        const { out } = await runCmd('/home/brgjr10/.local/bin/maigret', [query, '--top-sites', '50', '--timeout', '15'], 120000)
+        const combined = out
+        const extracted = extractAll(combined)
+        for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'maigret'})
+        for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'maigret'})
+        for (const url of extracted.urls) {
+          try {
+            if (/patreon\.com\/soxoj|googleapis|gstatic|akamai|cloudfront|fbcdn|tiktokcdn|twimg|githubusercontent|sndcdn|rapidproxy/.test(url)) continue
+            const u = new URL(url)
+            let site = u.hostname.replace(/^www\./,'')
+            const map = [['soundcloud','SoundCloud'],['github.com','GitHub'],['gitlab','GitLab'],['reddit.com','Reddit'],['facebook.com','Facebook'],['tiktok.com','TikTok'],['gravatar','Gravatar'],['imgur.com','Imgur'],['snapchat','Snapchat'],['steamcommunity.com','Steam'],['gist.github.com','GitHubGist']]
+            for (const [k,v] of map) if (site.includes(k)) { site = v; break }
+            if (!map.some(([k])=>site.toLowerCase().includes(k))) {
+              const p2 = site.split('.')
+              if (p2.length < 2) continue
+              site = p2[p2.length-2].charAt(0).toUpperCase() + p2[p2.length-2].slice(1)
+            }
+            addResult(site, categorizeSite(site), 'username match', 'exact', { url, connections: connections.slice(0,20) })
+          } catch {}
+        }
+      } catch {}
+      try {
+        const { out: out2 } = await runCmd('/home/brgjr10/.local/bin/sherlock', [query, '--timeout', '10', '--no-color'], 60000)
+        const ex2 = extractAll(out2)
+        for (const url of ex2.urls) {
+          try {
+            if (/googleapis|gstatic|akamai|cloudfront|fbcdn|tiktokcdn|twimg|githubusercontent|sndcdn|rapidproxy/.test(url)) continue
+            const u = new URL(url)
+            let site = u.hostname.replace(/^www\./,'')
             const p2 = site.split('.')
-            if (p2.length < 2) continue
-            site = p2[p2.length-2].charAt(0).toUpperCase() + p2[p2.length-2].slice(1)
-          }
-          const k = site.toLowerCase()
-          if (site && !seen.has(k)) {
-            seen.add(k)
-            const uniqConns = Array.from(new Map(connections.map(c=>[c.type+':'+c.value+':'+site,c])).values()).slice(0, 30)
-            results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'username match', match: 'exact', url, username: query, connections: uniqConns })
-          }
-        } catch {}
-      }
+            if (p2.length >= 2 && !/github|reddit|steam|twitch|medium|telegram|pinterest|stackoverflow|chess|soundcloud|habr|docker/.test(site)) {
+              site = p2[p2.length-2].charAt(0).toUpperCase() + p2[p2.length-2].slice(1)
+            }
+            addResult(site, categorizeSite(site), 'username match', 'exact', { url, connections: connections.slice(0,20) })
+          } catch {}
+        }
+      } catch {}
     } else if (kind === 'email') {
-      const { out } = await runCmd('/home/brgjr10/.local/bin/holehe', [query], 90000)
-      const extracted = extractAll(out)
-      for (const e of extracted.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type: 'email', value: e, source: 'holehe'})
-      for (const p of extracted.phones) connections.push({type: 'phone', value: p, source: 'holehe'})
-      for (const line of out.split('\n')) {
-        const m = line.match(/\[\+\]\s*(.+)/)
-        if (m) {
-          const site = m[1].trim()
-          if (site && !seen.has(site.toLowerCase())) {
-            seen.add(site.toLowerCase())
-            const uniqConns = Array.from(new Map(connections.map(c=>[c.type+':'+c.value,c])).values()).slice(0, 20)
-            results.push({ site, group: categorizeSite(site), since: '', hue: '#58a6ff', detail: 'email registered', match: 'likely', emails: [query], connections: uniqConns })
+      try {
+        const { out } = await runCmd('/home/brgjr10/.local/bin/holehe', [query], 90000)
+        for (const line of out.split('\n')) {
+          const m = line.match(/\[\+\]\s*(.+)/)
+          if (m) {
+            const site = m[1].trim()
+            if (site) addResult(site, categorizeSite(site), 'email registered', 'likely', { emails: [query], connections: connections.slice(0,20) })
           }
         }
-      }
+        const ex = extractAll(out)
+        for (const e of ex.emails) if (e.toLowerCase() !== query.toLowerCase()) connections.push({type:'email',value:e,source:'holehe'})
+        for (const ph of ex.phones) connections.push({type:'phone',value:ph,source:'holehe'})
+      } catch {}
+    } else if (kind === 'domain') {
+      // crt.sh certificate transparency
+      try {
+        const { out } = await runCmd('curl', ['-s', '-m', '30', `https://crt.sh/?q=%25.${query}&output=json`], 40000)
+        let arr = []
+        try { arr = JSON.parse(out) } catch {}
+        const subs = new Set()
+        for (const r of (Array.isArray(arr)?arr:[])) {
+          for (const n of String(r.name_value||'').split('\n')) {
+            const s = n.trim().toLowerCase()
+            if (s && s.endsWith(query.toLowerCase())) subs.add(s)
+          }
+        }
+        for (const s of Array.from(subs).slice(0, 40)) {
+          addResult(s, 'Infrastructure', 'certificate transparency', 'exact', { since: '', url: `https://${s}` })
+        }
+      } catch {}
+      // wayback machine availability
+      try {
+        const { out } = await runCmd('curl', ['-s', '-m', '20', `https://archive.org/wayback/available?url=${encodeURIComponent(query)}`], 30000)
+        try {
+          const j = JSON.parse(out)
+          if (j && j.archived_snapshots && j.archived_snapshots.closest) {
+            addResult('Wayback Machine', 'Web & archive', 'historical snapshots available', 'likely', { url: j.archived_snapshots.closest.url })
+          }
+        } catch {}
+      } catch {}
+    } else if (kind === 'phone') {
+      // best-effort: no free reliable API; return empty gracefully
+    } else if (kind === 'company') {
+      // GLEIF legal entity search (public)
+      try {
+        const { out } = await runCmd('curl', ['-s', '-m', '20', `https://api.gleif.org/api/v1/lei-records?filter[entity.legalName]=${encodeURIComponent(query)}&page[size]=10`], 30000)
+        try {
+          const j = JSON.parse(out)
+          const data = j && j.data ? j.data : []
+          for (const d of data) {
+            const name = d?.attributes?.entity?.legalName?.name || query
+            addResult(name, 'Corporate', 'legal entity (GLEIF)', 'likely', { url: `https://search.gleif.org/#/record/${d.id}` })
+          }
+        } catch {}
+      } catch {}
     }
   } catch (e) {}
-  try { fs.appendFileSync('/tmp/lookup.log', JSON.stringify({count: results.length, query, kind}) + '\n'); } catch (e) {}
+  try { require('node:fs').appendFileSync('/tmp/lookup.log', JSON.stringify({count: results.length, query, kind}) + '\n'); } catch (e) {}
   return results
 })
-
 
 app.whenReady().then(() => {
   createWindow()
