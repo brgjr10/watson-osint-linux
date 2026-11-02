@@ -113,7 +113,7 @@ export default function Results() {
             {same} of them look like the same person. {profiles.length - same} are name matches only.
           </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
-            <button className="flex h-10 items-center gap-2 rounded-full bg-white px-4 text-[15px] font-medium text-black transition-colors hover:bg-white/85">
+            <button onClick={() => window.print()} className="flex h-10 items-center gap-2 rounded-full bg-white px-4 text-[15px] font-medium text-black transition-colors hover:bg-white/85">
               <Download className="size-4" /> Save as PDF
             </button>
             <button onClick={() => navigator.clipboard?.writeText(profiles.map(p=>p.site+' '+p.url).join('\n'))} className="flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-[15px] font-medium text-paper transition-colors hover:bg-white/5">
