@@ -4,5 +4,7 @@ contextBridge.exposeInMainWorld('api', {
   checkBinary: (name) => ipcRenderer.invoke('checkBinary', name),
   connectSource: (name) => ipcRenderer.invoke('connectSource', name),
   setApiKey: (name, key) => ipcRenderer.invoke('setApiKey', name, key),
+  loadCases: () => ipcRenderer.invoke('loadCases'),
+  saveCases: (cases) => ipcRenderer.invoke('saveCases', cases),
 })
 contextBridge.exposeInMainWorld('__preloadLoaded', true)

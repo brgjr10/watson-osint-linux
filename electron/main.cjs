@@ -295,6 +295,14 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
   return results
 })
 
+const CASES_FILE = '/home/brgjr10/.config/watson/cases.json'
+ipcMain.handle('loadCases', async () => {
+  try { return JSON.parse(require('node:fs').readFileSync(CASES_FILE,'utf8')) } catch { return [] }
+})
+ipcMain.handle('saveCases', async (_e, cases) => {
+  try { require('node:fs').mkdirSync('/home/brgjr10/.config/watson',{recursive:true}); require('node:fs').writeFileSync(CASES_FILE, JSON.stringify(cases,null,2)); return {ok:true} } catch(e){ return {ok:false,msg:String(e)} }
+})
+
 app.whenReady().then(() => {
   createWindow()
   app.on('activate', () => {
