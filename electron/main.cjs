@@ -80,7 +80,9 @@ function categorizeSite(site) {
   return 'Social'
 }
 
+const NO_SETUP = new Set(['WaybackMachine','crt.sh','Wayback Machine'])
 ipcMain.handle('checkBinary', async (_e, name) => {
+  if (NO_SETUP.has(name)) return true
   const fs = require('node:fs')
   try {
     const data = JSON.parse(fs.readFileSync('/home/brgjr10/.config/watson/keys.json','utf8'))
