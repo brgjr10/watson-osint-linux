@@ -100,7 +100,7 @@ const INSTALL_CMDS = {
   'Holehe': ['python3', ['-m', 'pip', 'install', '--user', 'holehe']],
   'Sherlock': ['python3', ['-m', 'pip', 'install', '--user', 'sherlock-project']],
   'WhatsMyName': ['bash', ['-c', 'mkdir -p /home/brgjr10/.local/share/watson && (cd /home/brgjr10/.local/share/watson/WhatsMyName && git pull) || git clone https://github.com/WebBreacher/WhatsMyName.git /home/brgjr10/.local/share/watson/WhatsMyName']],
-  'Subfinder': ['go', ['install', 'github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest']],
+  'Subfinder': ['bash', ['-c', 'mkdir -p /home/brgjr10/.local/bin && curl -sL https://github.com/projectdiscovery/subfinder/releases/latest/download/subfinder_linux_amd64.zip -o /tmp/subfinder.zip && unzip -o /tmp/subfinder.zip -d /home/brgjr10/.local/bin && chmod +x /home/brgjr10/.local/bin/subfinder']],
   'Amass': null,
 }
 
