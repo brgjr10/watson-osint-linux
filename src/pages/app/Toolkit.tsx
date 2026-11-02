@@ -9,6 +9,8 @@ export default function Toolkit() {
   const [q, setQ] = useState('')
   const [statuses, setStatuses] = useState<Record<string,string>>({})
   const [custom, setCustom] = useState<any[]>([])
+  const [promptFor, setPromptFor] = useState<string | null>(null)
+  const [inputVal, setInputVal] = useState('')
   const handleAddCustom = () => {
     const name = window.prompt('Source name')
     if (!name) return
@@ -33,12 +35,14 @@ export default function Toolkit() {
   const connected = tools.filter((t: any) => (statuses[t.name] || t.status) === 'connected').length
   const total = tools.length
 
-  const handleConnect = async (name: string) => {
-    const val = window.prompt(`Connection string for ${name} (API key, binary path, or token)`)
-    if (val) await (window as any).api?.setApiKey?.(name, val)
-    const bin = name.toLowerCase().replace(/[^a-z0-9]/g,'')
-    const ok = await (window as any).api?.checkBinary?.(bin)
-    setStatuses((prev) => ({ ...prev, [name]: ok ? 'connected' : (prev[name] || 'available') }))
+  const handleConnect = (name: string) => { setPromptFor(name); setInputVal('') }
+  const submitConnect = async () => {
+    if (!promptFor) return
+    if (inputVal) await (window as any).api?.setApiKey?.(promptFor, inputVal)
+    const bin = promptFor.toLowerCase().replace(/[^a-z0-9]/g,'')
+    const ok = await (window as any).api?.checkBinary?.(bin) || !!inputVal
+    setStatuses((prev) => ({ ...prev, [promptFor]: ok ? 'connected' : (prev[promptFor] || 'available') }))
+    setPromptFor(null); setInputVal('')
   }
 
   return (
@@ -93,6 +97,18 @@ export default function Toolkit() {
           <button onClick={() => { setQ(''); setCat('All') }} className="mt-3 rounded-lg border border-white/10 px-3 py-2 text-[13px] text-paper-dim hover:text-paper">
             Clear filters
           </button>
+        </div>
+      )}
+      {promptFor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="rounded-lg border border-white/10 bg-ink-900 p-5 w-96">
+            <h3 className="text-[15px] font-medium mb-3">Connect {promptFor}</h3>
+            <input value={inputVal} onChange={(e) => setInputVal(e.target.value)} className="w-full rounded-lg border border-white/[0.08] bg-ink-950 px-3 py-2 text-[13px] outline-none" placeholder="API key / token / binary path" />
+            <div className="mt-3 flex justify-end gap-2">
+              <button onClick={() => setPromptFor(null)} className="rounded-md border border-white/10 px-3 py-1.5 text-[13px] text-paper-dim hover:text-paper">Cancel</button>
+              <button onClick={submitConnect} className="rounded-md bg-white/15 px-3 py-1.5 text-[13px] text-paper hover:bg-white/25">Save</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
