@@ -299,6 +299,15 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
         const cc = digits.startsWith('1') ? 'US/CA' : digits.startsWith('44') ? 'UK' : digits.startsWith('91') ? 'IN' : digits.startsWith('49') ? 'DE' : digits.startsWith('33') ? 'FR' : 'unknown'
         if (digits.length >= 10) addResult('Phone normalized', 'Identity', `country: ${cc}, digits: ${digits.length}`, 'exact', {})
       } catch {}
+      // generate search links for the number
+      try {
+        const qenc = encodeURIComponent(query)
+        const links = [
+          ['Google', `https://www.google.com/search?q=${qenc}`],
+          ['Truecaller (web)', `https://www.truecaller.com/search/${query.replace(/\D/g,'')}`],
+        ]
+        for (const [name,url] of links) addResult(name, 'Identity', 'search link', 'likely', { url })
+      } catch {}
       // best-effort public lookup via phoneinfoga if installed
       try {
         const { out } = await runCmd('which', ['phoneinfoga'], 5000)
