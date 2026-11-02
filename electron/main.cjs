@@ -283,6 +283,15 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
           try { const j=JSON.parse(out); const attrs=j.data&&j.data.attributes; if(attrs) addResult(query,'Threat intel',`VT reputation ${attrs.reputation||0}`,'likely',{url:`https://www.virustotal.com/gui/domain/${query}`}) } catch {}
         }
       } catch {}
+      // Hunter.io (if key stored) for domain
+      try {
+        const fs=require('node:fs')
+        const keys=JSON.parse(fs.readFileSync('/home/brgjr10/.config/watson/keys.json','utf8'))
+        if (keys && keys['Hunter.io']) {
+          const { out } = await runCmd('curl', ['-s','-m','20',`https://api.hunter.io/v2/domain-search?domain=${query}&api_key=${keys['Hunter.io']}`],30000)
+          try { const j=JSON.parse(out); for (const e of (j.data&&j.data.emails||[]).slice(0,20)) addResult(e.value,'Corporate','hunter email','likely',{url:`https://hunter.io`}) } catch {}
+        }
+      } catch {}
     } else if (kind === 'phone') {
       // best-effort public lookup via phoneinfoga if installed
       try {
