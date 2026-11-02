@@ -120,6 +120,15 @@ export default function Results() {
             <button onClick={() => navigator.clipboard?.writeText(profiles.map(p=>p.site+' '+p.url).join('\n'))} className="flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-[15px] font-medium text-paper transition-colors hover:bg-white/5">
               Copy
             </button>
+            <button onClick={async () => {
+              try {
+                const cases = await (window as any).api?.loadCases?.() || []
+                cases.unshift({ id: 'case-'+Date.now(), title: q, target: q, kind: detectKind(q), purpose: 'OSINT search', status: 'running', entities: profiles.length, updated: new Date().toISOString().slice(0,10), owner: 'Watson' })
+                await (window as any).api?.saveCases?.(cases)
+              } catch {}
+            }} className="flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-[15px] font-medium text-paper transition-colors hover:bg-white/5">
+              Save case
+            </button>
             <button onClick={() => {
               const blob = new Blob([JSON.stringify(profiles, null, 2)], { type: 'application/json' })
               const u = URL.createObjectURL(blob)
