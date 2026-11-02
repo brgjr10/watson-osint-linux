@@ -18,10 +18,6 @@ export interface GraphEdge {
   label?: string
 }
 
-export const caseGraph: { nodes: any[]; edges: any[] } = {
-  nodes: [],
-  edges: [],
-}
 
 export type ToolCategory = 'Infrastructure' | 'Identity' | 'Corporate' | 'Web & archive' | 'Threat intel' | 'Code' | 'Social' | 'Media'
 
@@ -34,31 +30,6 @@ export interface Tool {
   runs: number
 }
 
-export const tools: Tool[] = [
-  { name: 'Maigret', category: 'Identity', description: 'Username enumeration across sites', license: 'Open source', status: 'connected', runs: 0 },
-  { name: 'Holehe', category: 'Identity', description: 'Email account discovery', license: 'Open source', status: 'connected', runs: 0 },
-  { name: 'Sherlock', category: 'Identity', description: 'Username search across social networks', license: 'Open source', status: 'connected', runs: 0 },
-  { name: 'WhatsMyName', category: 'Identity', description: 'Username OSINT tool', license: 'Open source', status: 'available', runs: 0 },
-  { name: 'Subfinder', category: 'Infrastructure', description: 'Subdomain discovery', license: 'Open source', status: 'available', runs: 0 },
-  { name: 'Amass', category: 'Infrastructure', description: 'In-depth attack surface mapping', license: 'Open source', status: 'available', runs: 0 },
-  { name: 'Social Analyzer', category: 'Identity', description: 'Find profiles across 1000+ sites', license: 'Open source', status: 'available', runs: 0 },
-  { name: 'Web Check', category: 'Infrastructure', description: 'Website OSINT and tech stack analysis', license: 'Open source', status: 'available', runs: 0 },
-  { name: 'HaveIBeenPwned', category: 'Identity', description: 'Data breach checker', license: 'Freemium', status: 'available', runs: 0 },
-  { name: 'Shodan', category: 'Infrastructure', description: 'Internet-connected device search', license: 'Freemium', status: 'available', runs: 0 },
-  { name: 'VirusTotal', category: 'Threat intel', description: 'File/URL/domain reputation', license: 'Freemium', status: 'available', runs: 0 },
-  { name: 'Wayback Machine', category: 'Web & archive', description: 'Internet archive search', license: 'Free', status: 'available', runs: 0 },
-  { name: 'crt.sh', category: 'Infrastructure', description: 'Certificate transparency logs', license: 'Free', status: 'available', runs: 0 },
-  { name: 'Hunter.io', category: 'Corporate', description: 'Email finder and verifier', license: 'Freemium', status: 'available', runs: 0 },
-  { name: 'Google Dorks', category: 'Web & archive', description: 'Advanced search operators', license: 'Free', status: 'connected', runs: 0 },
-  { name: 'Bing', category: 'Web & archive', description: 'Web search', license: 'Free', status: 'connected', runs: 0 },
-  { name: 'DuckDuckGo', category: 'Web & archive', description: 'Privacy-focused search', license: 'Free', status: 'connected', runs: 0 },
-  { name: 'LinkedIn', category: 'Corporate', description: 'Professional network', license: 'Free', status: 'available', runs: 0 },
-  { name: 'Twitter/X', category: 'Social', description: 'Social media search', license: 'Free', status: 'available', runs: 0 },
-  { name: 'Instagram', category: 'Social', description: 'Photo/video platform', license: 'Free', status: 'available', runs: 0 },
-  { name: 'Facebook', category: 'Social', description: 'Social network', license: 'Free', status: 'available', runs: 0 },
-  { name: 'TikTok', category: 'Social', description: 'Short video platform', license: 'Free', status: 'available', runs: 0 },
-  { name: 'YouTube', category: 'Media', description: 'Video platform', license: 'Free', status: 'available', runs: 0 },
-]
 
 export interface CaseRow {
   id: string
@@ -74,7 +45,6 @@ export interface CaseRow {
 
 export const cases: CaseRow[] = []
 
-export const agentSteps: any[] = []
 
 export type SearchKind = 'username' | 'email' | 'phone' | 'domain' | 'company'
 
@@ -108,8 +78,6 @@ export interface FoundProfile {
   connections?: Array<{type: string, value: string, source?: string}>
 }
 
-
-export const EXAMPLE_QUERY = 'johndoe_92'
 
 /**
  * Real lookups only - no mock data.

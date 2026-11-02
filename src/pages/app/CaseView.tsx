@@ -16,7 +16,8 @@ import {
 } from '@phosphor-icons/react'
 import { LogoMark } from '../../components/Logo'
 import { EvidenceGraph, RiskMark, kindIcon } from '../../components/EvidenceGraph'
-import { agentSteps, caseGraph } from '../../data/mock'
+const agentSteps: any[] = []
+const caseGraph: { nodes: any[]; edges: any[] } = { nodes: [], edges: [] }
 import type { CaseRow } from '../../data/mock'
 
 const statusStyle: Record<CaseRow['status'], string> = {
