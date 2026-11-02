@@ -22,6 +22,7 @@ export default function Cases() {
           ))}
         </ul>
       )}
+      <button onClick={async () => { await (window as any).api?.saveCases?.([]); setCases([]) }} className="mt-4 rounded-lg border border-white/10 px-3 py-1.5 text-[13px] text-paper-dim hover:text-paper">Clear cases</button>
     </div>
   )
 }
