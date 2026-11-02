@@ -117,6 +117,22 @@ export default function Results() {
             <button className="flex h-10 items-center gap-2 rounded-full bg-white px-4 text-[15px] font-medium text-black transition-colors hover:bg-white/85">
               <Download className="size-4" /> Save as PDF
             </button>
+            <button onClick={() => {
+              const blob = new Blob([JSON.stringify(profiles, null, 2)], { type: 'application/json' })
+              const u = URL.createObjectURL(blob)
+              const a = document.createElement('a'); a.href = u; a.download = `${q}-watson.json`; a.click(); URL.revokeObjectURL(u)
+            }} className="flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-[15px] font-medium text-paper transition-colors hover:bg-white/5">
+              <Download className="size-4" /> Export JSON
+            </button>
+            <button onClick={() => {
+              const rows = ['site,group,match,detail,url']
+              for (const p of profiles) rows.push(`"${p.site}","${p.group}","${p.match}","${p.detail}","${p.url||''}"`)
+              const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+              const u = URL.createObjectURL(blob)
+              const a = document.createElement('a'); a.href = u; a.download = `${q}-watson.csv`; a.click(); URL.revokeObjectURL(u)
+            }} className="flex h-10 items-center gap-2 rounded-full border border-white/10 px-4 text-[15px] font-medium text-paper transition-colors hover:bg-white/5">
+              <Download className="size-4" /> Export CSV
+            </button>
           </div>
         </section>
       )}
