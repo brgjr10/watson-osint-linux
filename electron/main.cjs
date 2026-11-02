@@ -346,13 +346,15 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
       const name = (ogTitle || title || '').trim()
       const bio = (ogDesc || metaDesc || '').trim()
       const links = (out.match(/https?:\/\/[^"\s<>]+/g)||[]).filter(u=>/github|twitter|linkedin|instagram|youtube|medium/i.test(u)).slice(0,5)
+      const img = (out.match(/property=["']og:image["'][^>]*content=["']([^"']+)/i)||[])[1]
+      if (img && !r.avatar) r.avatar = img
       if (name && !r.name) r.name = name
       if (bio && !r.bio) r.bio = bio
       if (links.length && !r.links) r.links = Array.from(new Set(links))
     } catch {}
     return r
   }
-  const toEnrich = results.filter(r=>r.url).slice(0,8)
+  const toEnrich = results.filter(r=>r.url).slice(0,12)
   await Promise.all(toEnrich.map(enrichOne))
 
   try { require('node:fs').appendFileSync('/tmp/lookup.log', JSON.stringify({count: results.length, query, kind}) + '\n'); } catch (e) {}
