@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   ArrowUp,
@@ -32,6 +32,11 @@ const examples: [SearchKind, string][] = [
 export default function Search() {
   const [q, setQ] = useState('')
   const navigate = useNavigate()
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='k') { e.preventDefault(); document.querySelector<HTMLInputElement>('input[aria-label="What to search for"]')?.focus() } }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [])
   const kind = q.trim() ? detectKind(q) : null
   const meta = kind ? kindMeta[kind] : null
 
