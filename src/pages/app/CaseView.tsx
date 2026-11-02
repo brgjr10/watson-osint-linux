@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import {
   ArrowUp,
@@ -16,7 +16,7 @@ import {
 } from '@phosphor-icons/react'
 import { LogoMark } from '../../components/Logo'
 import { EvidenceGraph, RiskMark, kindIcon } from '../../components/EvidenceGraph'
-import { agentSteps, caseGraph, cases } from '../../data/mock'
+import { agentSteps, caseGraph } from '../../data/mock'
 import type { CaseRow } from '../../data/mock'
 
 const statusStyle: Record<CaseRow['status'], string> = {
@@ -60,7 +60,9 @@ const zoomActions = [
 
 export default function CaseView() {
   const { id } = useParams()
-  const c = cases.find((x: CaseRow) => x.id === id) ?? cases[0]
+  const [cases, setCases] = useState<any[]>([])
+  useEffect(() => { (window as any).api?.loadCases?.().then((r:any) => { if(Array.isArray(r)) setCases(r) }).catch(()=>{}) }, [])
+  const c = (cases.length ? (cases.find((x:any)=>x.id===id) ?? cases[0]) : { id, title:'Case', target:'', kind:'person', purpose:'', status:'running', entities:0, updated:'', owner:'' })
   const [selected, setSelected] = useState('sub1')
   const node = caseGraph.nodes.find((n: any) => n.id === selected)
   if (!node) {
@@ -87,7 +89,7 @@ export default function CaseView() {
       <div className="flex flex-wrap items-center gap-3 border-b border-white/[0.06] px-5 py-3.5">
         <span className="font-mono text-xs text-fog">{c.id}</span>
         <h1 className="text-[15px] font-medium">{c.title}</h1>
-        <span className={`rounded-full px-2 py-0.5 text-[11px] capitalize ${statusStyle[c.status]}`}>{c.status}</span>
+        <span className={`rounded-full px-2 py-0.5 text-[11px] capitalize ${statusStyle[c.status as keyof typeof statusStyle]}`}>{c.status}</span>
         <span className="flex items-center gap-1.5 rounded-full border border-white/10 px-2 py-0.5 text-[11px] text-fog">
           <Scale className="size-3" /> {c.purpose}
         </span>
