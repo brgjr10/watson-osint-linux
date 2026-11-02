@@ -265,6 +265,24 @@ ipcMain.handle('lookup', async (_e, kind, query) => {
         const lines = out.trim().split('\n').filter(Boolean)
         for (const l of lines.slice(0,5)) addResult(l.trim(), 'Infrastructure', 'DNS resolution', 'exact', {})
       } catch {}
+      // Shodan (if key stored)
+      try {
+        const fs=require('node:fs')
+        const keys=JSON.parse(fs.readFileSync('/home/brgjr10/.config/watson/keys.json','utf8'))
+        if (keys && keys.Shodan) {
+          const { out } = await runCmd('curl', ['-s','-m','20',`https://api.shodan.io/dns/domain/${query}?key=${keys.Shodan}`],30000)
+          try { const j=JSON.parse(out); for (const sub of (j.subdomains||[]).slice(0,20)) addResult(sub+'.'+query,'Infrastructure','shodan subdomain','likely',{}) } catch {}
+        }
+      } catch {}
+      // VirusTotal (if key stored)
+      try {
+        const fs=require('node:fs')
+        const keys=JSON.parse(fs.readFileSync('/home/brgjr10/.config/watson/keys.json','utf8'))
+        if (keys && keys.VirusTotal) {
+          const { out } = await runCmd('curl', ['-s','-m','20','-H',`x-apikey: ${keys.VirusTotal}`,`https://www.virustotal.com/api/v3/domains/${query}`],30000)
+          try { const j=JSON.parse(out); const attrs=j.data&&j.data.attributes; if(attrs) addResult(query,'Threat intel',`VT reputation ${attrs.reputation||0}`,'likely',{url:`https://www.virustotal.com/gui/domain/${query}`}) } catch {}
+        }
+      } catch {}
     } else if (kind === 'phone') {
       // best-effort public lookup via phoneinfoga if installed
       try {
